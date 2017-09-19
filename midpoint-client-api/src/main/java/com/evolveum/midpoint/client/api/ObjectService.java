@@ -15,16 +15,13 @@
  */
 package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.client.api.verb.Get;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public interface Service {
-	
-	// TODO
-//	ProxyService proxy();
+public interface ObjectService<O extends ObjectType> extends Get<O> {
 
-	ObjectCollectionService<UserType> users();
 }

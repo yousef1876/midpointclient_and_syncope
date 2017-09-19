@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.api;
-
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+package com.evolveum.midpoint.client.api.verb;
 
 /**
  * @author semancik
  *
  */
-public interface Service {
-	
-	// TODO
-//	ProxyService proxy();
+public interface Post<T> {
 
-	ObjectCollectionService<UserType> users();
+	T post();
+	
 }

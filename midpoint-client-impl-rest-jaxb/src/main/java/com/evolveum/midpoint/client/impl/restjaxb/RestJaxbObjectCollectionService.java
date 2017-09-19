@@ -16,20 +16,30 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.Service;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbService implements Service {
-	
-	// TODO: jaxb context
+public class RestJaxbObjectCollectionService<O extends ObjectType> implements ObjectCollectionService<O> {
 
-	@Override
-	public ObjectCollectionService<UserType> users() {
-		return new RestJaxbObjectCollectionService<>(this, UserType.class);
+	final private RestJaxbService service;
+	final private Class<O> type;
+	// TODO: URL prefix?
+	// TODO: abstract class for type+service+urlprefix?
+	
+	public RestJaxbObjectCollectionService(RestJaxbService service, Class<O> type) {
+		super();
+		this.service = service;
+		this.type = type;
 	}
 
+	@Override
+	public ObjectService<O> oid(String oid) {
+		return new RestJaxbObjectService<>(service, type);
+	}
+	
+	
 }
