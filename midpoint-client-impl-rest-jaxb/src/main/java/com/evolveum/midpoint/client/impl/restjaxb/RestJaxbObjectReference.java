@@ -50,4 +50,12 @@ public class RestJaxbObjectReference<O extends ObjectType> extends AbstractObjec
 		return object != null;
 	}
 
+	@Override
+	public O get() {
+		if (object == null) {
+			object = getService().getObject(getUrlPrefix(), getType(), getOid());
+		}
+		return object;
+	}
+
 }

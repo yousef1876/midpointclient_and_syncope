@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
+
+import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
  * @author semancik
  *
  */
-public abstract class AbstractWebResource {
-
-	final private RestJaxbService service;
-	final private String urlPrefix;
+public interface ServiceUtil {
 	
-	public AbstractWebResource(final RestJaxbService service, final String urlPrefix) {
-		super();
-		this.service = service;
-		this.urlPrefix = urlPrefix;
-	}
+	PolyStringType createPoly(String orig);
 
-	protected RestJaxbService getService() {
-		return service;
-	}
-
-	protected String getUrlPrefix() {
-		return urlPrefix;
-	}
+	String getOrig(PolyStringType poly);
 	
+	// TODO: util methods for object extension
+
 }

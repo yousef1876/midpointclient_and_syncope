@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.api;
-
-import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
+package com.evolveum.midpoint.client.impl.restjaxb;
 
 /**
  * @author semancik
  *
  */
-public class ObjectUtils {
+public class RestUtil {
 	
-	public static PolyStringType createPoly(String orig) {
-		PolyStringType poly = new PolyStringType();
-		poly.getContent().add(orig);
-		return poly;
+	public static String subUrl(final String urlPrefix, final String pathSegment) {
+		// TODO: better code (e.g. escaping)
+		return urlPrefix + "/" + pathSegment;
 	}
+	
 
 }

@@ -31,10 +31,7 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 
 	@Override
 	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
+		return getService().getObject(getUrlPrefix(), getType(), getOid());
 	}
 	
 	

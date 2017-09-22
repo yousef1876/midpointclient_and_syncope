@@ -15,27 +15,34 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
+
 /**
  * @author semancik
  *
  */
-public abstract class AbstractWebResource {
-
-	final private RestJaxbService service;
-	final private String urlPrefix;
+public class RestJaxbServiceUtil implements ServiceUtil {
 	
-	public AbstractWebResource(final RestJaxbService service, final String urlPrefix) {
-		super();
-		this.service = service;
-		this.urlPrefix = urlPrefix;
+	@Override
+	public PolyStringType createPoly(String orig) {
+		PolyStringType poly = new PolyStringType();
+		poly.getContent().add(orig);
+		return poly;
 	}
 
-	protected RestJaxbService getService() {
-		return service;
+	@Override
+	public String getOrig(PolyStringType poly) {
+		if (poly == null) {
+			return null;
+		}
+		for (Object content: poly.getContent()) {
+			if (content instanceof String) {
+				return (String)content;
+			}
+			// TODO: DOM elements and JAXB elements
+		}
+		return null;
 	}
 
-	protected String getUrlPrefix() {
-		return urlPrefix;
-	}
-	
 }

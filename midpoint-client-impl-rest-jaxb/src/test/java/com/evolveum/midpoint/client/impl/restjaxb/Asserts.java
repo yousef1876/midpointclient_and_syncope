@@ -15,27 +15,23 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import org.testng.AssertJUnit;
+
+import com.evolveum.midpoint.client.api.Service;
+import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
+
 /**
  * @author semancik
  *
  */
-public abstract class AbstractWebResource {
+public class Asserts {
 
-	final private RestJaxbService service;
-	final private String urlPrefix;
-	
-	public AbstractWebResource(final RestJaxbService service, final String urlPrefix) {
-		super();
-		this.service = service;
-		this.urlPrefix = urlPrefix;
+	public static void assertPoly(Service service, String message, String expected, PolyStringType actualPoly) {
+		String actual = null;
+		if (actualPoly != null) {
+			actual = service.util().getOrig(actualPoly);
+		}
+		AssertJUnit.assertEquals(message, expected, actual);
 	}
 
-	protected RestJaxbService getService() {
-		return service;
-	}
-
-	protected String getUrlPrefix() {
-		return urlPrefix;
-	}
-	
 }

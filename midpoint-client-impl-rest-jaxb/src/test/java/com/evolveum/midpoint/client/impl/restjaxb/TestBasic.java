@@ -20,7 +20,7 @@ import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
 import com.evolveum.midpoint.client.api.ObjectReference;
-import com.evolveum.midpoint.client.api.ObjectUtils;
+import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.client.api.Service;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 
@@ -46,13 +46,17 @@ public class TestBasic {
 		Service service = getService();
 		
 		UserType userBefore = new UserType();
-		userBefore.setName(ObjectUtils.createPoly("foo"));
+		userBefore.setName(service.util().createPoly("foo"));
 		
 		// WHEN
 		ObjectReference<UserType> ref = service.users().add(userBefore).post();
 		
 		// THEN
 		assertNotNull("Null oid", ref.getOid());
+		
+		UserType userAfter = ref.get();
+		Asserts.assertPoly(service, "Wrong name", "foo", userAfter.getName());
+		
 		// TODO: get user, compare
 		
 	}

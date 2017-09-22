@@ -15,6 +15,7 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
@@ -29,7 +30,7 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
  * @author semancik
  *
  */
-public interface ObjectReference<O extends ObjectType> {
+public interface ObjectReference<O extends ObjectType> extends Get<O> {
 
 	String getOid();
 	

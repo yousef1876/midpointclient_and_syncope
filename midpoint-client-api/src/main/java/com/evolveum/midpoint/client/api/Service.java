@@ -27,4 +27,6 @@ public interface Service {
 //	ProxyService proxy();
 
 	ObjectCollectionService<UserType> users();
+	
+	ServiceUtil util();
 }

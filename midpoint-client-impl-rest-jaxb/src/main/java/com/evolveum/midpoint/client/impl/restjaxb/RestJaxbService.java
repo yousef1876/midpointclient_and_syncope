@@ -17,6 +17,8 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectCollectionService;
 import com.evolveum.midpoint.client.api.Service;
+import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 
 /**
@@ -26,12 +28,34 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 public class RestJaxbService implements Service {
 	
 	private static final String URL_PREFIX_USERS = "users";
+	
+	private final ServiceUtil util;
 
 	// TODO: jaxb context
+	
+	public RestJaxbService() {
+		super();
+		util = new RestJaxbServiceUtil();
+	}	
 
 	@Override
 	public ObjectCollectionService<UserType> users() {
 		return new RestJaxbObjectCollectionService<>(this, URL_PREFIX_USERS, UserType.class);
+	}
+
+	@Override
+	public ServiceUtil util() {
+		return util;
+	}
+	
+	/**
+	 * Used frequently at several places. Therefore unified here.
+	 */
+	<O extends ObjectType> O getObject(final String collectionUrlPrefix, final Class<O> type, final String oid) {
+		// TODO
+		String urlPrefix = RestUtil.subUrl(collectionUrlPrefix, oid);
+		// TODO
+		return null;
 	}
 
 }
