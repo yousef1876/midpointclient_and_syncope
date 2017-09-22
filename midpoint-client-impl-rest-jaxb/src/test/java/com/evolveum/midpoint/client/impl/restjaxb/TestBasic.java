@@ -31,7 +31,7 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 public class TestBasic {
 	
 	@Test
-	public void testUserGet() {
+	public void testUserGet() throws Exception {
 		Service service = getService();
 		
 		// WHEN
@@ -42,7 +42,7 @@ public class TestBasic {
 	}
 	
 	@Test
-	public void testUserAdd() {
+	public void testUserAdd() throws Exception {
 		Service service = getService();
 		
 		UserType userBefore = new UserType();

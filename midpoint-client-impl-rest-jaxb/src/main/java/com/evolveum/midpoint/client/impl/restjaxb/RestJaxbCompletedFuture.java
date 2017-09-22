@@ -15,33 +15,45 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectAddService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import com.evolveum.midpoint.client.api.ObjectReference;
 import com.evolveum.midpoint.client.api.TaskFuture;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.TaskType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements ObjectAddService<O> {
+public class RestJaxbCompletedFuture<T> implements TaskFuture<T> {
 
-	private final O object;
+	private final T object;
 	
-	public RestJaxbObjectAddService(final RestJaxbService service, final String urlPrefix, final Class<O> type, final O object) {
-		super(service, urlPrefix, type);
+	public RestJaxbCompletedFuture(T object) {
+		super();
 		this.object = object;
 	}
 
 	@Override
-	public TaskFuture<ObjectReference<O>> apost() {
-		// TODO: add object
-		
-		// if object created (sync):
-		String oid = null;
-		RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getUrlPrefix(), getType(), oid);
-		return new RestJaxbCompletedFuture<>(ref);
+	public T get() throws InterruptedException, ExecutionException {
+		return object;
 	}
-	
-	
+
+	@Override
+	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		return object;
+	}
+
+	@Override
+	public boolean isDone() {
+		return true;
+	}
+
+	@Override
+	public ObjectReference<TaskType> getTaskRef() {
+		return null;
+	}
+
 }

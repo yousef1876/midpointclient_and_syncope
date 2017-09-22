@@ -15,12 +15,56 @@
  */
 package com.evolveum.midpoint.client.api.verb;
 
+import java.util.concurrent.ExecutionException;
+
+import com.evolveum.midpoint.client.api.TaskFuture;
+import com.evolveum.midpoint.client.api.exception.CommonException;
+import com.evolveum.midpoint.client.api.exception.OperationInProgressException;
+import com.evolveum.midpoint.client.api.exception.SystemException;
+
 /**
  * @author semancik
  *
  */
 public interface Post<T> {
 
-	T post();
+	/**
+	 * Synchronous POST.
+	 */
+	default T post() throws OperationInProgressException, CommonException {
+		
+		TaskFuture<T> future = apost();
+		
+		if (!future.isDone()) {
+			// TODO: better error message
+			throw new OperationInProgressException("Operation in progress");
+		}
+		
+		try {
+			
+			return future.get();
+			
+		} catch (InterruptedException e) {
+			// We do not support interruptions or cancelations yet.
+			// Therefore this should not happen.
+			throw new SystemException("Unexpected internal error", e);
+			
+		} catch (ExecutionException e) {
+			// Exception during execution
+			Throwable cause = e.getCause();
+			if (cause instanceof CommonException) {
+				throw (CommonException)cause;				
+			} else if (cause instanceof RuntimeException) {
+				throw (RuntimeException)cause;
+			} else {
+				throw new SystemException("Unexpected internal error", e);
+			}
+		}
+	}
+	
+	/**
+	 * Potentially asynchronous POST.
+	 */
+	TaskFuture<T> apost();
 	
 }
