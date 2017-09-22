@@ -13,29 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
+import java.util.List;
+
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public interface SearchResult<O extends ObjectType> extends List<O> {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
-	}
-
-	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
-	}
-	
-	
 }

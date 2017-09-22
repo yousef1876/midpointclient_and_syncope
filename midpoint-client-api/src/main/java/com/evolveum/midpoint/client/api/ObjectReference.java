@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
+ * Reference to an object. It contains object OID and type as
+ * a very minimum. But the reference may be resolved and then
+ * it contains full object.
+ * 
+ * The reference is used in places where the method can return
+ * either object identifiers (OID, type) or they may return complete
+ * object.
+ * 
  * @author semancik
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public interface ObjectReference<O extends ObjectType> {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
-	}
-
-	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
-	}
+	String getOid();
 	
+	Class<O> getType();
 	
+	O getObject();
+	
+	boolean containsObject();
 }

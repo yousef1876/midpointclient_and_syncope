@@ -15,27 +15,32 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
-
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public abstract class AbstractWebResource {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
+	final private RestJaxbService service;
+	final private String urlPrefix;
+	
+	public AbstractWebResource(final RestJaxbService service, final String urlPrefix) {
+		super();
+		this.service = service;
+		this.urlPrefix = urlPrefix;
 	}
 
-	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
+	protected RestJaxbService getService() {
+		return service;
+	}
+
+	protected String getUrlPrefix() {
+		return urlPrefix;
 	}
 	
+	protected String subUrl(String pathSegment) {
+		// TODO: better code (e.g. escaping)
+		return urlPrefix + "/" + pathSegment;
+	}
 	
 }

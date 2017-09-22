@@ -37,5 +37,10 @@
             <groupId>com.evolveum.midpoint.infra</groupId>
             <artifactId>schema-pure-jaxb</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

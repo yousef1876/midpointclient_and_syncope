@@ -13,29 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
+ * 
+ * 
  * @author semancik
- *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
-
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
-	}
-
-	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
-	}
+public interface QueryBuilder<O extends ObjectType> extends Get<SearchResult<O>> {
 	
+	// TODO: do we need separate QueryBuilder and QueryBuilderService?
 	
+	// TODO: item(), and(), or(), ...
+	
+	/**
+	 * Returns search service with the query set.
+	 */
+	SearchService<O> build();
+	
+	/**
+	 * Shortcut.
+	 * From: r.query().item(x).eq(y).build().get();
+	 * To:   r.query().item(x).eq(y).get();
+	 */
+	default SearchResult<O> get() {
+		return build().get();
+	}
 }

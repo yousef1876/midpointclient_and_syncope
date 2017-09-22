@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.Service;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbService implements Service {
+public class ObjectUtils {
 	
-	private static final String URL_PREFIX_USERS = "users";
-
-	// TODO: jaxb context
-
-	@Override
-	public ObjectCollectionService<UserType> users() {
-		return new RestJaxbObjectCollectionService<>(this, URL_PREFIX_USERS, UserType.class);
+	public static PolyStringType createPoly(String orig) {
+		PolyStringType poly = new PolyStringType();
+		poly.getContent().add(orig);
+		return poly;
 	}
 
 }

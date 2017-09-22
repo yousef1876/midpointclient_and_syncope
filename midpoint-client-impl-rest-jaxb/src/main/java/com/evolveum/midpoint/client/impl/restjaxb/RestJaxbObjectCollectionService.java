@@ -15,31 +15,35 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import com.evolveum.midpoint.client.api.ObjectAddService;
 import com.evolveum.midpoint.client.api.ObjectCollectionService;
 import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.SearchService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectCollectionService<O extends ObjectType> implements ObjectCollectionService<O> {
+public class RestJaxbObjectCollectionService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements ObjectCollectionService<O> {
 
-	final private RestJaxbService service;
-	final private Class<O> type;
-	// TODO: URL prefix?
-	// TODO: abstract class for type+service+urlprefix?
-	
-	public RestJaxbObjectCollectionService(RestJaxbService service, Class<O> type) {
-		super();
-		this.service = service;
-		this.type = type;
+	public RestJaxbObjectCollectionService(final RestJaxbService service, final String urlPrefix, final Class<O> type) {
+		super(service, urlPrefix, type);
 	}
 
 	@Override
 	public ObjectService<O> oid(String oid) {
-		return new RestJaxbObjectService<>(service, type);
+		return new RestJaxbObjectService<>(getService(), getUrlPrefix(), getType(), oid);
 	}
-	
+
+	@Override
+	public SearchService<O> search() {
+		return new RestJaxbSearchService<>(getService(), getUrlPrefix(), getType());
+	}
+
+	@Override
+	public ObjectAddService<O> add(O object) {
+		return new RestJaxbObjectAddService<>(getService(), getUrlPrefix(), getType(), object);
+	}
 	
 }

@@ -15,27 +15,34 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.QueryBuilder;
+import com.evolveum.midpoint.client.api.SearchResult;
+import com.evolveum.midpoint.client.api.SearchService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public class RestJaxbSearchService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements SearchService<O> {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
+	// TODO: private ObjectQuery query;
+	
+	public RestJaxbSearchService(final RestJaxbService service, final String urlPrefix, final Class<O> type) {
+		super(service, urlPrefix, type);
 	}
 
 	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
+	public SearchResult<O> get() {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	@Override
+	public QueryBuilder<O> query() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

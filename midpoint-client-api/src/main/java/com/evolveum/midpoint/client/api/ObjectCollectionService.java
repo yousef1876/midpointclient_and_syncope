@@ -25,6 +25,12 @@ public interface ObjectCollectionService<O extends ObjectType> {
 
 	ObjectService<O> oid(String oid);
 	
+	SearchService<O> search();
+	
+	// TODO: get() as search().get()? or vice versa?
+	
+	ObjectAddService<O> add(O object);
+	
 	// TODO
 	
 }

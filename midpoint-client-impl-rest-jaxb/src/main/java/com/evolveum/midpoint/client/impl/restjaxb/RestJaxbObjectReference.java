@@ -15,27 +15,39 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
-import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.ObjectReference;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
  * @author semancik
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public class RestJaxbObjectReference<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectReference<O> {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
+	public RestJaxbObjectReference(RestJaxbService service, String collectionUrlPrefix, Class<O> type, String oid) {
 		super(service, collectionUrlPrefix, type, oid);
 	}
 
+	private O object = null;
+	
 	@Override
-	public O get() {
-		RestJaxbService service = getService();
-		String urlPrefix = subUrl(getOid());
-		// TODO: Implement actual object get
-		return null;
+	public String getOid() {
+		return super.getOid();
 	}
-	
-	
+
+	@Override
+	public Class<O> getType() {
+		return super.getType();
+	}
+
+	@Override
+	public O getObject() {
+		return object;
+	}
+
+	@Override
+	public boolean containsObject() {
+		return object != null;
+	}
+
 }
