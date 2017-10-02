@@ -15,6 +15,9 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import javax.xml.namespace.QName;
+
+import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
@@ -27,6 +30,7 @@ public interface ServiceUtil {
 
 	String getOrig(PolyStringType poly);
 	
+	public ItemPathType createItemPathType(QName... qname);
 	// TODO: util methods for object extension
 
 }

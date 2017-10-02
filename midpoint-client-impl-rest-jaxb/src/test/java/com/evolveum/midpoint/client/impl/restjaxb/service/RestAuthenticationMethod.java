@@ -13,25 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.impl.restjaxb.service;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import org.apache.commons.lang.StringUtils;
 
 /**
- * @author semancik
+ * 
+ * @author katkav
  *
  */
-public abstract class AbstractObjectTypeWebResource<O extends ObjectType> extends AbstractWebResource {
+public enum RestAuthenticationMethod {
 
-	final private Class<O> type;
-	
-	public AbstractObjectTypeWebResource(final RestJaxbService service, final Class<O> type) {
-		super(service);
-		this.type = type;
+	BASIC("Basic"),
+	SECURITY_QUESTIONS("SecQ");
+
+	private String method;
+
+	private RestAuthenticationMethod(String method) {
+		this.method = method;
 	}
 
-	protected Class<O> getType() {
-		return type;
+	public String getMethod() {
+		return method;
 	}
-		
+
+	protected boolean equals(String authenticationType) {
+		if (StringUtils.isBlank(authenticationType)) {
+			return false;
+		}
+
+		if (getMethod().equals(authenticationType)) {
+			return true;
+		}
+		return false;
+	}
 }

@@ -15,23 +15,20 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
-
 /**
- * @author semancik
+ * 
+ * @author katkav
  *
  */
-public abstract class AbstractObjectTypeWebResource<O extends ObjectType> extends AbstractWebResource {
+public class SchemaConstants {
 
-	final private Class<O> type;
+	public static final String NS_COMMON_PREFIX = "c:";
+	public static final String NS_API_TYPES_PREFIX = "apit:";
+	public static final String NS_QUERY_PREFIX = "q:";
+	public static final String NS_TYPES_PREFIX = "t:";
 	
-	public AbstractObjectTypeWebResource(final RestJaxbService service, final Class<O> type) {
-		super(service);
-		this.type = type;
-	}
-
-	protected Class<O> getType() {
-		return type;
-	}
-		
+	public static final String NS_COMMON = "http://midpoint.evolveum.com/xml/ns/public/common/common-3";
+	public static final String NS_API_TYPES = "http://midpoint.evolveum.com/xml/ns/public/common/api-types-3";
+	public static final String NS_QUERY = "http://prism.evolveum.com/xml/ns/public/query-3";
+	public static final String NS_TYPES = "http://prism.evolveum.com/xml/ns/public/types-3";
 }

@@ -28,22 +28,23 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 public class RestJaxbObjectCollectionService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements ObjectCollectionService<O> {
 
 	public RestJaxbObjectCollectionService(final RestJaxbService service, final String urlPrefix, final Class<O> type) {
-		super(service, urlPrefix, type);
+		super(service, type);
 	}
 
 	@Override
 	public ObjectService<O> oid(String oid) {
-		return new RestJaxbObjectService<>(getService(), getUrlPrefix(), getType(), oid);
+		return new RestJaxbObjectService<>(getService(), getType(), oid);
 	}
 
 	@Override
 	public SearchService<O> search() {
-		return new RestJaxbSearchService<>(getService(), getUrlPrefix(), getType());
+		return new RestJaxbSearchService<>(getService(), getType());
 	}
 
 	@Override
 	public ObjectAddService<O> add(O object) {
-		return new RestJaxbObjectAddService<>(getService(), getUrlPrefix(), getType(), object);
+		return new RestJaxbObjectAddService<>(getService(), getType(), object);
 	}
 	
+	//TODO: [katka] modify?
 }

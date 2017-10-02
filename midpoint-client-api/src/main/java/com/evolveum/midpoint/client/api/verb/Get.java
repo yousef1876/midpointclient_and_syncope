@@ -15,12 +15,14 @@
  */
 package com.evolveum.midpoint.client.api.verb;
 
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
+
 /**
  * @author semancik
  *
  */
 public interface Get<T> {
 
-	T get();
+	T get() throws ObjectNotFoundException;
 	
 }

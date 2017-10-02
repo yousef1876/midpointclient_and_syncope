@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api;
+
+import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
-/**
- * @author semancik
- *
- */
-public abstract class AbstractObjectTypeWebResource<O extends ObjectType> extends AbstractWebResource {
+public interface MatchingRuleEntryBuilder<O extends ObjectType> extends AtomicFilterExit<O>{
 
-	final private Class<O> type;
 	
-	public AbstractObjectTypeWebResource(final RestJaxbService service, final Class<O> type) {
-		super(service);
-		this.type = type;
-	}
-
-	protected Class<O> getType() {
-		return type;
-	}
-		
+	 AtomicFilterExit<O> matchingOrig();
+	 AtomicFilterExit<O> matchingNorm();
+	 AtomicFilterExit<O> matchingStrict();
+	 AtomicFilterExit<O> matchingCaseIgnore();
+	 AtomicFilterExit<O> matching(QName matchingRuleName);
 }

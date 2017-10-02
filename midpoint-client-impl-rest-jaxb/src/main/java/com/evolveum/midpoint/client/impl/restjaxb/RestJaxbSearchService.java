@@ -15,33 +15,55 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import com.evolveum.midpoint.client.api.QueryBuilder;
 import com.evolveum.midpoint.client.api.SearchResult;
 import com.evolveum.midpoint.client.api.SearchService;
+import com.evolveum.midpoint.client.api.Service;
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectListType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.prism.xml.ns._public.query_3.QueryType;
 
 /**
  * @author semancik
+ * @author katkav
  *
  */
 public class RestJaxbSearchService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements SearchService<O> {
 
-	// TODO: private ObjectQuery query;
+	private QueryType query;
 	
-	public RestJaxbSearchService(final RestJaxbService service, final String urlPrefix, final Class<O> type) {
-		super(service, urlPrefix, type);
+	public RestJaxbSearchService(final RestJaxbService service, final Class<O> type) {
+		this(service, type, null);
 	}
-
-	@Override
-	public SearchResult<O> get() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public RestJaxbSearchService(final RestJaxbService service, final Class<O> type, final QueryType query) {
+		super(service, type);
+		this.query = query;
 	}
-
-	@Override
-	public QueryBuilder<O> query() {
-		// TODO Auto-generated method stub
+	
+		@Override
+	public SearchResult<O> get() throws ObjectNotFoundException {
+		Response response = getService().getClient().replacePath("/" + Types.findType(getType()).getRestPath() + "/search").post(query);
+		
+		if (Status.OK.getStatusCode() == response.getStatus()) {
+			ObjectListType resultList = response.readEntity(ObjectListType.class);
+			return new JaxbSearchResult(resultList.getObject());
+		}
+		
+		if (Status.NOT_FOUND.getStatusCode() == response.getStatus()) {
+			throw new ObjectNotFoundException("Cannot search objects. No such service");
+		}
 		return null;
+		
+	}
+		
+	@Override
+	public QueryBuilder<O> queryFor(Service service, Class<O> type) {
+		return new RestJaxbQueryBuilder<O>(getService(), getType());
 	}
 
 	

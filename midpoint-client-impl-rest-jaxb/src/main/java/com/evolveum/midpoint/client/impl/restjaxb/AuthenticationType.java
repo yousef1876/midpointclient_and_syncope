@@ -15,23 +15,16 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
-
 /**
- * @author semancik
+ * 
+ * @author katkav
  *
  */
-public abstract class AbstractObjectTypeWebResource<O extends ObjectType> extends AbstractWebResource {
+public enum AuthenticationType {
 
-	final private Class<O> type;
 	
-	public AbstractObjectTypeWebResource(final RestJaxbService service, final Class<O> type) {
-		super(service);
-		this.type = type;
-	}
-
-	protected Class<O> getType() {
-		return type;
-	}
-		
+	BASIC,
+	SECQ;
+	
+	
 }

@@ -15,8 +15,8 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectCollectionService;
 import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
@@ -25,13 +25,13 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
  */
 public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
 
-	public RestJaxbObjectService(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type, oid);
+	public RestJaxbObjectService(final RestJaxbService service, final Class<O> type, final String oid) {
+		super(service, type, oid);
 	}
 
 	@Override
-	public O get() {
-		return getService().getObject(getUrlPrefix(), getType(), getOid());
+	public O get() throws ObjectNotFoundException {
+		return getService().getObject(getType(), getOid());
 	}
 	
 	

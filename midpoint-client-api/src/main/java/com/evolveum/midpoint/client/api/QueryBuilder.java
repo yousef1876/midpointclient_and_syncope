@@ -15,8 +15,12 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import javax.xml.namespace.QName;
+
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
 /**
  * 
@@ -34,12 +38,20 @@ public interface QueryBuilder<O extends ObjectType> extends Get<SearchResult<O>>
 	 */
 	SearchService<O> build();
 	
+	public ConditionEntryBuilder<O> item(ItemPathType itemPath); 
+	public ConditionEntryBuilder<O> item(QName... qnames);
+	
+	
+	
 	/**
 	 * Shortcut.
 	 * From: r.query().item(x).eq(y).build().get();
 	 * To:   r.query().item(x).eq(y).get();
 	 */
-	default SearchResult<O> get() {
+	default SearchResult<O> get() throws ObjectNotFoundException {
 		return build().get();
 	}
+	
+	
 }
+

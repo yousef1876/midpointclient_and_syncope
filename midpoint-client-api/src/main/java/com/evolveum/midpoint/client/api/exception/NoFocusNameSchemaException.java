@@ -13,24 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
+package com.evolveum.midpoint.client.api.exception;
 
 /**
  * @author semancik
  *
  */
-public abstract class AbstractWebResource {
+public class NoFocusNameSchemaException extends SchemaException {
+	private static final long serialVersionUID = 1L;
 
-	final private RestJaxbService service;
-
-	
-	public AbstractWebResource(final RestJaxbService service) {
+	public NoFocusNameSchemaException() {
 		super();
-		this.service = service;
 	}
 
-	protected RestJaxbService getService() {
-		return service;
+	public NoFocusNameSchemaException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public NoFocusNameSchemaException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public NoFocusNameSchemaException(String message) {
+		super(message);
+	}
+
+	public NoFocusNameSchemaException(Throwable cause) {
+		super(cause);
 	}
 
 }

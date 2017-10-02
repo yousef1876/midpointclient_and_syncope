@@ -23,7 +23,7 @@ public class RestUtil {
 	
 	public static String subUrl(final String urlPrefix, final String pathSegment) {
 		// TODO: better code (e.g. escaping)
-		return urlPrefix + "/" + pathSegment;
+		return "/" + urlPrefix + "/" + pathSegment;
 	}
 	
 

@@ -18,6 +18,7 @@ package com.evolveum.midpoint.client.api.verb;
 import java.util.concurrent.ExecutionException;
 
 import com.evolveum.midpoint.client.api.TaskFuture;
+import com.evolveum.midpoint.client.api.exception.AuthorizationException;
 import com.evolveum.midpoint.client.api.exception.CommonException;
 import com.evolveum.midpoint.client.api.exception.OperationInProgressException;
 import com.evolveum.midpoint.client.api.exception.SystemException;
@@ -64,7 +65,8 @@ public interface Post<T> {
 	
 	/**
 	 * Potentially asynchronous POST.
+	 * @throws AuthorizationException 
 	 */
-	TaskFuture<T> apost();
+	TaskFuture<T> apost() throws AuthorizationException;
 	
 }

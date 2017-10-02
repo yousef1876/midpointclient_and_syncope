@@ -25,8 +25,8 @@ public abstract class AbstractObjectWebResource<O extends ObjectType> extends Ab
 
 	final private String oid;
 	
-	public AbstractObjectWebResource(final RestJaxbService service, final String collectionUrlPrefix, final Class<O> type, final String oid) {
-		super(service, collectionUrlPrefix, type);
+	public AbstractObjectWebResource(final RestJaxbService service, final Class<O> type, final String oid) {
+		super(service, type);
 		this.oid = oid;
 	}
 

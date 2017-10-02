@@ -16,6 +16,7 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectReference;
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
@@ -24,8 +25,8 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
  */
 public class RestJaxbObjectReference<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectReference<O> {
 
-	public RestJaxbObjectReference(RestJaxbService service, String collectionUrlPrefix, Class<O> type, String oid) {
-		super(service, collectionUrlPrefix, type, oid);
+	public RestJaxbObjectReference(RestJaxbService service, Class<O> type, String oid) {
+		super(service, type, oid);
 	}
 
 	private O object = null;
@@ -51,9 +52,9 @@ public class RestJaxbObjectReference<O extends ObjectType> extends AbstractObjec
 	}
 
 	@Override
-	public O get() {
+	public O get() throws ObjectNotFoundException {
 		if (object == null) {
-			object = getService().getObject(getUrlPrefix(), getType(), getOid());
+			object = getService().getObject(getType(), getOid());
 		}
 		return object;
 	}

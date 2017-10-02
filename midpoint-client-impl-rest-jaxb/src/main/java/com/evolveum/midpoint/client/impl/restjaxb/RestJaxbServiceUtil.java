@@ -15,7 +15,12 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import java.util.Arrays;
+
+import javax.xml.namespace.QName;
+
 import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
@@ -43,6 +48,14 @@ public class RestJaxbServiceUtil implements ServiceUtil {
 			// TODO: DOM elements and JAXB elements
 		}
 		return null;
+	}
+	
+	@Override
+	public ItemPathType createItemPathType(QName... qname) {
+		ItemPathType itemPathType = new ItemPathType();
+		itemPathType.setValue("");
+		Arrays.asList(qname).forEach(name -> itemPathType.setValue(itemPathType + "/" + name.getLocalPart()));
+		return itemPathType;
 	}
 
 }

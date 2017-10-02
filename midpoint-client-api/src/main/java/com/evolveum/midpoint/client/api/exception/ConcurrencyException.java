@@ -13,25 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.evolveum.midpoint.client.impl.restjaxb;
-
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+package com.evolveum.midpoint.client.api.exception;
 
 /**
  * @author semancik
  *
  */
-public abstract class AbstractObjectTypeWebResource<O extends ObjectType> extends AbstractWebResource {
+public class ConcurrencyException extends CommonException {
+	private static final long serialVersionUID = 1L;
 
-	final private Class<O> type;
-	
-	public AbstractObjectTypeWebResource(final RestJaxbService service, final Class<O> type) {
-		super(service);
-		this.type = type;
+	public ConcurrencyException() {
+		super();
 	}
 
-	protected Class<O> getType() {
-		return type;
+	public ConcurrencyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
-		
+
+	public ConcurrencyException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ConcurrencyException(String message) {
+		super(message);
+	}
+
+	public ConcurrencyException(Throwable cause) {
+		super(cause);
+	}
+
 }

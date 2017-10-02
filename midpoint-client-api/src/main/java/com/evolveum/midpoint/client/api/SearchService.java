@@ -27,8 +27,6 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
  */
 public interface SearchService<O extends ObjectType> extends Get<SearchResult<O>> {
 
-	QueryBuilder<O> query();
-	
-	// TODO
+	QueryBuilder<O> queryFor(Service service, Class<O> type);
 	
 }
