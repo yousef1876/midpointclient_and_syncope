@@ -21,10 +21,10 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -37,6 +37,7 @@ import org.testng.annotations.Test;
 import com.evolveum.midpoint.client.api.ObjectReference;
 import com.evolveum.midpoint.client.api.SearchResult;
 import com.evolveum.midpoint.client.api.Service;
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.impl.restjaxb.service.AuthenticationProvider;
 import com.evolveum.midpoint.client.impl.restjaxb.service.MidpointMockRestService;
@@ -46,7 +47,6 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.AssignmentType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
-import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
  * @author semancik
@@ -63,54 +63,7 @@ public class TestBasic {
 	}
 	
 	@Test
-	public void testUserSearch() throws Exception {
-		Service service = getService();
-		
-		// WHEN
-		ItemPathType itemPath = new ItemPathType();
-		itemPath.setValue("name");
-		AssignmentType cal = new AssignmentType();
-		cal.setDescription("asdasda");
-		ObjectReferenceType ort = new ObjectReferenceType();
-		ort.setOid("12312313");
-		cal.setTargetRef(ort);
-		ActivationType activation = new ActivationType();
-		activation.setAdministrativeStatus(ActivationStatusType.ARCHIVED);
-		cal.setActivation(activation);
-		service.users().search().queryFor(service, UserType.class).item(itemPath).eq().finishQuery().build();
-		SearchResult<UserType> result = service.users().search().queryFor(service, UserType.class).item(itemPath).eq("jack").finishQuery().build().get();
-		
-		// THEN
-		assertEquals(result.size(), 1);
-	}
-	
-	@Test
-	public void testUserGet() throws Exception {
-		Service service = getService();
-		
-		// WHEN
-		UserType userType = service.users().oid("123").get();
-		
-		// THEN
-		assertNotNull("null user", userType);
-	}
-	
-	@Test
-	public void testUserGetNotExist() throws Exception {
-		Service service = getService();
-		
-		// WHEN
-		try {
-			service.users().oid("999").get();
-			fail("Unexpected user found");
-		} catch (ObjectNotFoundException e) {
-			// nothing to do. this is expected
-		}
-		
-	}
-	
-	@Test
-	public void testUserAdd() throws Exception {
+	public void test001UserAdd() throws Exception {
 		Service service = getService();
 		
 		UserType userBefore = new UserType();
@@ -130,10 +83,142 @@ public class TestBasic {
 		
 	}
 	
-	private Service getService() throws IOException {
+	@Test
+	public void test002UserGet() throws Exception {
+		Service service = getService();
+		
+		// WHEN
+		UserType userType = service.users().oid("123").get();
+		
+		// THEN
+		assertNotNull("null user", userType);
+	}
+	
+	@Test
+	public void test003UserGetNotExist() throws Exception {
+		Service service = getService();
+		
+		// WHEN
+		try {
+			service.users().oid("999").get();
+			fail("Unexpected user found");
+		} catch (ObjectNotFoundException e) {
+			// nothing to do. this is expected
+		}
+		
+	}
+	
+	@Test
+	public void test010UserSearch() throws Exception {
+		Service service = getService();
+		
+		// WHEN
+		ItemPathType itemPath = new ItemPathType();
+		itemPath.setValue("name");
+//		AssignmentType cal = new AssignmentType();
+//		cal.setDescription("asdasda");
+//		ObjectReferenceType ort = new ObjectReferenceType();
+//		ort.setOid("12312313");
+//		cal.setTargetRef(ort);
+//		ActivationType activation = new ActivationType();
+//		activation.setAdministrativeStatus(ActivationStatusType.ARCHIVED);
+//		cal.setActivation(activation);
+		
+		
+		
+		SearchResult<UserType> result = service.users().search().queryFor(UserType.class).item(itemPath).eq("jack").finishQuery().get();
+		
+		// THEN
+		assertEquals(result.size(), 0);
+	}
+	
+	
+	
+	@Test
+	public void test100challengeRepsonse() throws Exception {
+		RestJaxbService service = (RestJaxbService) getService("administrator", "", AuthenticationType.SECQ);
+		
+		try { 
+			service.users().oid("123").get();
+			fail("unexpected success. should fail because of authentication");
+		} catch (AuthenticationException ex) {
+			//this is expected.. 
+		}
+		
+		SecurityQuestionChallenge challenge = (SecurityQuestionChallenge) service.getAuthenticationManager().getChallenge();
+		for (SecurityQuestionAnswer qa : challenge.getAnswer()) {
+			if ("id1".equals(qa.getQid())) {
+				qa.setQans("I'm pretty good, thanks for AsKinG");
+			} else {
+				qa.setQans("I do NOT have FAVORITE c0l0r!");
+			}
+			
+		}
+		
+		
+		service = (RestJaxbService) getService("administrator", challenge.getAnswer());
+		
+		try { 
+			service.users().oid("123").get();
+			
+		} catch (AuthenticationException ex) {
+			fail("should authenticate user successfully");
+		}
+		
+		
+	}
+	
+	@Test
+	public void test200fullChallengeRepsonse() throws Exception {
+		RestJaxbService service = (RestJaxbService) getService(null, null, null);
+		
+		try { 
+			service.users().oid("123").get();
+			fail("unexpected success. should fail because of authentication");
+		} catch (AuthenticationException ex) {
+			//this is expected.. 
+		}
+		
+		List<AuthenticationType> supportedAuthentication = service.getSupportedAuthenticationsByServer();
+		assertNotNull("no supported authentication. something wen wrong", supportedAuthentication);
+		AuthenticationType basicAtuh = supportedAuthentication.iterator().next();
+		assertEquals(basicAtuh.getType(), AuthenticationType.BASIC.getType(), "expected basic authentication, but got" + basicAtuh);
+		
+		
+		service = (RestJaxbService) getService("administrator", "5ecr3t", basicAtuh);
+		
+		try { 
+			service.users().oid("123").get();
+			
+		} catch (AuthenticationException ex) {
+			fail("should authenticate user successfully");
+		}
+		
+		
+	}
+	
+private Service getService() throws IOException {
+		
+		return getService("administrator", "5ecr3t", AuthenticationType.BASIC);
+		
+	}
+	
+	private Service getService(String username, List<SecurityQuestionAnswer> answer) throws IOException {
+	
+	RestJaxbServiceBuilder serviceBuilder = new RestJaxbServiceBuilder();
+	serviceBuilder.authentication(AuthenticationType.SECQ).username(username).authenticationChallenge(answer).url(ENDPOINT_ADDRESS);
+	RestJaxbService service = serviceBuilder.build();
+	WebClient client = service.getClient();
+	WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+	
+	return service;
+	
+}
+
+	private Service getService(String username, String password, AuthenticationType authenticationType) throws IOException {
 		
 		RestJaxbServiceBuilder serviceBuilder = new RestJaxbServiceBuilder();
-		serviceBuilder.authentication(AuthenticationType.BASIC).username("administrator").password("5ecr3t").url(ENDPOINT_ADDRESS);
+		serviceBuilder.authentication(authenticationType).username(username).password(password).url(ENDPOINT_ADDRESS);
 		RestJaxbService service = serviceBuilder.build();
 		WebClient client = service.getClient();
 		WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);

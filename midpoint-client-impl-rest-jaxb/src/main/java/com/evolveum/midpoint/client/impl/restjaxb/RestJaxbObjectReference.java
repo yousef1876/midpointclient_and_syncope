@@ -16,6 +16,7 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectReference;
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
@@ -52,7 +53,7 @@ public class RestJaxbObjectReference<O extends ObjectType> extends AbstractObjec
 	}
 
 	@Override
-	public O get() throws ObjectNotFoundException {
+	public O get() throws ObjectNotFoundException, AuthenticationException {
 		if (object == null) {
 			object = getService().getObject(getType(), getOid());
 		}

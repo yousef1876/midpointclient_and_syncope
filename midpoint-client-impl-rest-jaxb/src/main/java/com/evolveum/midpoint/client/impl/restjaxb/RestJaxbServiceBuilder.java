@@ -16,6 +16,7 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 
@@ -28,6 +29,7 @@ public class RestJaxbServiceBuilder {
 	private AuthenticationType authentication;
 	private String username;
 	private String password;
+	private List<SecurityQuestionAnswer> questionAnswer;
 	
 	
 	public RestJaxbServiceBuilder url(String url) {
@@ -50,8 +52,14 @@ public class RestJaxbServiceBuilder {
 		return this;
 	}
 	
-	public RestJaxbService build() throws IOException {
-		return new RestJaxbService(url, username, password, authentication);
+	public RestJaxbServiceBuilder authenticationChallenge(List<SecurityQuestionAnswer> questionAnswer) {
+		this.questionAnswer = questionAnswer;
+		return this;
 	}
-
+	
+	public RestJaxbService build() throws IOException {
+		return new RestJaxbService(url, username, password, authentication, questionAnswer);
+	}
+	
+	
 }

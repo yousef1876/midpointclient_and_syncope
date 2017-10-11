@@ -15,6 +15,13 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.jetty.server.Authentication;
+
+import com.evolveum.midpoint.client.api.exception.SchemaException;
+
 /**
  * 
  * @author katkav
@@ -23,8 +30,33 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 public enum AuthenticationType {
 
 	
-	BASIC,
-	SECQ;
+	BASIC("Basic"),
+	SECQ("SecQ");
 	
+	private String type;
+	private Class<AuthenticationManager<? extends AuthenticationChallenge>> clazz; 
 	
+	private AuthenticationType(String type) {
+		this.type = type;
+//		this.clazz = clazz;
+	}
+	
+	public static AuthenticationType getAuthenticationType(String type) throws SchemaException {
+		
+		if (StringUtils.isBlank(type)) {
+			return null;
+		}
+		
+		return Arrays.asList(values()).stream().filter(authnType -> type.equals(authnType.getType())).findAny().orElseThrow(() -> new SchemaException("Unsupported type: " + type));
+		
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+//	public <T extends AbstractAuthentication> Class<T> getClazz() {
+//		return (Class<T>) clazz;
+//	}
+//	
 }

@@ -16,7 +16,9 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,12 +28,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.w3c.dom.Document;
 
 import com.evolveum.midpoint.client.api.ObjectCollectionService;
 import com.evolveum.midpoint.client.api.Service;
 import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
@@ -52,6 +57,8 @@ public class RestJaxbService implements Service {
 	private WebClient client;
 	private DomSerializer domSerializer;
 	private JAXBContext jaxbContext;
+	private AuthenticationManager<?> authenticationManager;
+	private List<AuthenticationType> supportedAuthenticationsByServer;
 	
 	public WebClient getClient() {
 		return client;
@@ -65,28 +72,59 @@ public class RestJaxbService implements Service {
 		return jaxbContext;
 	}
 	
+	public List<AuthenticationType> getSupportedAuthenticationsByServer() {
+		if (supportedAuthenticationsByServer == null) {
+			supportedAuthenticationsByServer = new ArrayList<>();
+		}
+		return supportedAuthenticationsByServer;
+	}
+	
+	
+	public <T extends AuthenticationChallenge> AuthenticationManager<T> getAuthenticationManager() {
+		return (AuthenticationManager<T>) authenticationManager;
+	}
+	
 	public RestJaxbService() {
 		super();
 		client = WebClient.create("");
 		util = new RestJaxbServiceUtil();
 	}
 	
-	RestJaxbService(String url, String username, String password, AuthenticationType authentication) throws IOException {
+	RestJaxbService(String url, String username, String password, AuthenticationType authentication, List<SecurityQuestionAnswer> secQ) throws IOException {
 		super();
 		try {
 			jaxbContext = createJaxbContext();
 		} catch (JAXBException e) {
 			throw new IOException(e);
 		}
+		
+		if (AuthenticationType.SECQ == authentication) {
+			authenticationManager = new SecurityQuestionAuthenticationManager(username, secQ);
+		} else if (authentication != null ){
+			authenticationManager = new BasicAuthenticationManager(username, password);
+		}
+		
+		CustomAuthNProvider authNProvider = new CustomAuthNProvider(authenticationManager, this);
 		client = WebClient.create(url, Arrays.asList(new JaxbXmlProvider<>(jaxbContext)));
+		ClientConfiguration config = WebClient.getConfig(client);
+		config.getInInterceptors().add(authNProvider);
+		config.getInFaultInterceptors().add(authNProvider);
 		client.accept(MediaType.APPLICATION_XML);
 		client.type(MediaType.APPLICATION_XML);
 		
-		if (username != null) {
-			String authorizationHeader = "Basic " + org.apache.cxf.common.util.Base64Utility
-					.encode((username + ":" + (password == null ? "" : password)).getBytes());
-			client.header("Authorization", authorizationHeader);
+		if (authenticationManager != null) {
+			authenticationManager.createAuthorizationHeader(client);
 		}
+		
+		
+//		if (authentication != null) {
+//			String authorizationHeader = authentication.getType();
+//			if (StringUtils.isNotBlank(username)) {
+//			 authorizationHeader += " " + org.apache.cxf.common.util.Base64Utility
+//					.encode((username + ":" + (password == null ? "" : password)).getBytes());
+//			}
+//			client.header("Authorization", authorizationHeader);
+//		}
 		
 		util = new RestJaxbServiceUtil();
 		domSerializer = new DomSerializer(jaxbContext);
@@ -106,7 +144,7 @@ public class RestJaxbService implements Service {
 	 * Used frequently at several places. Therefore unified here.
 	 * @throws ObjectNotFoundException 
 	 */
-	<O extends ObjectType> O getObject(final Class<O> type, final String oid) throws ObjectNotFoundException {
+	<O extends ObjectType> O getObject(final Class<O> type, final String oid) throws ObjectNotFoundException, AuthenticationException {
 		// TODO
 		String urlPrefix = RestUtil.subUrl(Types.findType(type).getRestPath(), oid);
 		Response response = client.replacePath(urlPrefix).get();
@@ -117,6 +155,10 @@ public class RestJaxbService implements Service {
 		
 		if (Status.NOT_FOUND.getStatusCode() == response.getStatus()) {
 			throw new ObjectNotFoundException("Cannot get object with oid" + oid + ". Object doesn't exist");
+		}
+		
+		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
+			throw new AuthenticationException("Cannot authentication user");
 		}
 		
 		return null;

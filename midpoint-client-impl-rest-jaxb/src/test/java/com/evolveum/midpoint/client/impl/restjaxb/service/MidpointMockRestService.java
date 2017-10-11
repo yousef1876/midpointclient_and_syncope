@@ -135,6 +135,7 @@ public class MidpointMockRestService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		return RestMockServiceUtil.createResponse(Status.OK, resultList, result);
 	}
 	

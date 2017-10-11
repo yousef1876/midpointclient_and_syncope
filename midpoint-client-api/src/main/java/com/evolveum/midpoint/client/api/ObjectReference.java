@@ -15,6 +15,7 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
@@ -37,7 +38,7 @@ public interface ObjectReference<O extends ObjectType> extends Get<O> {
 	
 	Class<O> getType();
 	
-	O getObject() throws ObjectNotFoundException;
+	O getObject() throws ObjectNotFoundException, AuthenticationException;
 	
 	boolean containsObject();
 }
