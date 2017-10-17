@@ -164,6 +164,23 @@ public class RestJaxbService implements Service {
 		return null;
 	}
 
+	<O extends ObjectType> void deleteObject(final Class<O> type, final String oid) throws ObjectNotFoundException, AuthenticationException {
+		String urlPrefix = RestUtil.subUrl(Types.findType(type).getRestPath(), oid);
+		Response response = client.replacePath(urlPrefix).delete();
+
+		if (Status.OK.getStatusCode() == response.getStatus() ) {
+			//TODO: Do we want to return anything on successful delete or just remove this if block?
+		}
+
+		if (Status.NOT_FOUND.getStatusCode() == response.getStatus()) {
+			throw new ObjectNotFoundException("Cannot delete object with oid" + oid + ". Object doesn't exist");
+		}
+
+		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
+			throw new AuthenticationException("Cannot authentication user");
+		}
+	}
+
 	private JAXBContext createJaxbContext() throws JAXBException {
 		JAXBContext jaxbCtx = JAXBContext.newInstance("com.evolveum.midpoint.xml.ns._public.common.api_types_3:"
 				+ "com.evolveum.midpoint.xml.ns._public.common.audit_3:"

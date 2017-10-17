@@ -15,12 +15,16 @@
  */
 package com.evolveum.midpoint.client.api.verb;
 
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
+
 /**
  * @author semancik
  *
  */
 public interface Delete<T> {
 
-	T delete();
+	//TODO: Does this need to return anything?
+	void delete() throws ObjectNotFoundException, AuthenticationException;;
 	
 }

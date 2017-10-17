@@ -112,17 +112,17 @@ public class MidpointMockRestService {
                                                         @Context MessageContext mc){
 
 		OperationResultType result = new OperationResultType();
-		result.setOperation("Get object");
+		result.setOperation("Delete object");
+
+        if (!objectMap.get(type).containsKey(id)) {
+            result.setStatus(OperationResultStatusType.FATAL_ERROR);
+            result.setMessage("Object with oid " + id + " was not found.");
+            return RestMockServiceUtil.createResponse(Status.NOT_FOUND, result);
+        }
+
 		objectMap.get(type).remove(id);
 
-		if (objectMap.get(type).containsKey(id)) {
-			result.setStatus(OperationResultStatusType.FATAL_ERROR);
-			result.setMessage("User with oid " + id + " was not deleted");
-			return RestMockServiceUtil.createResponse(Status.FOUND, result);
-		}
-
 		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).build();
-
 	}
 	
 	@POST

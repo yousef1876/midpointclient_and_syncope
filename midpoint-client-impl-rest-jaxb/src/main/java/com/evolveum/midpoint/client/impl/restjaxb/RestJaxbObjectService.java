@@ -34,6 +34,11 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	public O get() throws ObjectNotFoundException, AuthenticationException {
 		return getService().getObject(getType(), getOid());
 	}
-	
-	
+
+
+	@Override
+	public void delete() throws ObjectNotFoundException, AuthenticationException
+	{
+		 getService().deleteObject(getType(), getOid());
+	}
 }

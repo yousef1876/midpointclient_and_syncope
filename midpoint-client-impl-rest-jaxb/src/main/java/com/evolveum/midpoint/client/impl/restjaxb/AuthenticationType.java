@@ -18,7 +18,7 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.jetty.server.Authentication;
+
 
 import com.evolveum.midpoint.client.api.exception.SchemaException;
 
