@@ -107,6 +107,38 @@ public class TestBasic {
 		}
 		
 	}
+
+	@Test
+	public void test004UserDeleteNotExist() throws Exception{
+		Service service = getService();
+
+		// WHEN
+		try{
+			service.users().oid("999").delete();
+			fail("Unexpected user deleted");
+		}catch(ObjectNotFoundException e){
+			// nothing to do. this is expected
+		}
+	}
+
+	@Test
+	public void test005UserDelete() throws Exception{
+		// SETUP
+		Service service = getService();
+
+		UserType userDelete = new UserType();
+		userDelete.setOid("321");
+
+		ObjectReference<UserType> ref = service.users().add(userDelete).post();
+		assertNotNull("Setup failed, user not added", ref.getOid());
+
+		// WHEN
+		try{
+			service.users().oid("321").delete();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot delete user, user not found");
+		}
+	}
 	
 	@Test
 	public void test010UserSearch() throws Exception {
