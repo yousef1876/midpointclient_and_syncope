@@ -22,13 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -106,6 +100,29 @@ public class MidpointMockRestService {
 		
 		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
 		
+	}
+
+	@DELETE
+	@Path("/{type}/{id}")
+	@Produces({MediaType.APPLICATION_XML})
+	public <T extends ObjectType> Response deleteObject(@PathParam("type") String type, @PathParam("id") String id,
+                                                        @QueryParam("options") List<String> options,
+                                                        @QueryParam("include") List<String> include,
+                                                        @QueryParam("exclude") List<String> exclude,
+                                                        @Context MessageContext mc){
+
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Get object");
+		objectMap.get(type).remove(id);
+
+		if (objectMap.get(type).containsKey(id)) {
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("User with oid " + id + " was not deleted");
+			return RestMockServiceUtil.createResponse(Status.FOUND, result);
+		}
+
+		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).build();
+
 	}
 	
 	@POST
