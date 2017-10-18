@@ -1,12 +1,10 @@
 package com.evolveum.midpoint.client.api;
 
+import com.evolveum.midpoint.client.api.verb.Post;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+
 /**
- * Description
- *
- * @author Jake Morris - jake
- * @version 1.0
- * @since 1.0
+ * @author jakmor
  */
-public class ObjectModifyService
-{
+public interface ObjectModifyService <O extends ObjectType> extends Post<ObjectReference<O>>{
 }

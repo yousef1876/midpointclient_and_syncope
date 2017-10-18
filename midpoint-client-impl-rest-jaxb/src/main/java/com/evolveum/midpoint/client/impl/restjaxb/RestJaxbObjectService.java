@@ -20,6 +20,8 @@ import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
+import java.util.Map;
+
 /**
  * @author semancik
  *
@@ -40,5 +42,10 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	public void delete() throws ObjectNotFoundException, AuthenticationException
 	{
 		 getService().deleteObject(getType(), getOid());
+	}
+
+	public void modify(Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException
+	{
+		getService().modifyObject(getType(), getOid(), modifications);
 	}
 }

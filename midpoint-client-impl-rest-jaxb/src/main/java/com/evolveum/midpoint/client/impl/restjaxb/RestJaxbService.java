@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
@@ -190,6 +191,10 @@ public class RestJaxbService implements Service {
 		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
 			throw new AuthenticationException("Cannot authentication user");
 		}
+	}
+
+	<O extends ObjectType> void modifyObject(final Class<O> type, final String oid, Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException {
+		
 	}
 
 	private JAXBContext createJaxbContext() throws JAXBException {

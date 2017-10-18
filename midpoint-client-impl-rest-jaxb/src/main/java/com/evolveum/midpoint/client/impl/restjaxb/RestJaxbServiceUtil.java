@@ -16,11 +16,15 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
+import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
+import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 
 /**
