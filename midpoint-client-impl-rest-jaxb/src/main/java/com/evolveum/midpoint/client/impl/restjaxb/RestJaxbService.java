@@ -159,7 +159,7 @@ public class RestJaxbService implements Service {
 		}
 		
 		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
-			throw new AuthenticationException();
+			throw new AuthenticationException(response.getStatusInfo().getReasonPhrase());
 		}
 		
 		return null;

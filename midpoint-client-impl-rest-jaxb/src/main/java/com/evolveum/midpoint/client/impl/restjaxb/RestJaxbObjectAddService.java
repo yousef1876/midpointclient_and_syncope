@@ -56,8 +56,8 @@ public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObje
 				throw new AuthorizationException(response.getStatusInfo().getReasonPhrase());
 			case 409:
 				throw new ObjectAlreadyExistsException(response.getStatusInfo().getReasonPhrase());
-			case 202:
 			case 201:
+			case 202:
 				String location = response.getLocation().toString();
 				String[] locationSegments = location.split(restPath + "/");
 				oid = locationSegments[1];
