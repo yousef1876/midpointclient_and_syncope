@@ -55,12 +55,11 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
-		//startServer();
+		startServer();
 	}
 	
 	@Test
@@ -179,9 +178,8 @@ public class TestBasic {
 			} else {
 				qa.setQans("I do NOT have FAVORITE c0l0r!");
 			}
-			
+
 		}
-		
 		
 		service = (RestJaxbService) getService("administrator", challenge.getAnswer());
 		
