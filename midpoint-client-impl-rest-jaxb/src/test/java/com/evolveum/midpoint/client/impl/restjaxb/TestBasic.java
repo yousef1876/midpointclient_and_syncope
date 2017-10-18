@@ -122,6 +122,18 @@ public class TestBasic {
 	}
 
 	@Test
+	public void test005UserModify() throws Exception{
+		Service service = getService();
+
+		// WHEN
+		try{
+			//TODO: service.users().oid("123").modify();
+		}catch(Exception e){
+
+		}
+	}
+
+	@Test
 	public void test201UserDelete() throws Exception{
 		// SETUP
 		Service service = getService();

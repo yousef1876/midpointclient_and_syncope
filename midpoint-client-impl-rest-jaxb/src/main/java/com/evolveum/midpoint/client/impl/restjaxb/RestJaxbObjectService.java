@@ -44,8 +44,9 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 		 getService().deleteObject(getType(), getOid());
 	}
 
+	@Override
 	public void modify(Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException
 	{
-		getService().modifyObject(getType(), getOid(), modifications);
+		return new RestJaxbObjectModifyService<O>(getService(), getType(), getOid(), modifications);
 	}
 }

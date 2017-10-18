@@ -193,10 +193,6 @@ public class RestJaxbService implements Service {
 		}
 	}
 
-	<O extends ObjectType> void modifyObject(final Class<O> type, final String oid, Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException {
-		
-	}
-
 	private JAXBContext createJaxbContext() throws JAXBException {
 		JAXBContext jaxbCtx = JAXBContext.newInstance("com.evolveum.midpoint.xml.ns._public.common.api_types_3:"
 				+ "com.evolveum.midpoint.xml.ns._public.common.audit_3:"

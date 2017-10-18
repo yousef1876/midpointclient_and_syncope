@@ -7,6 +7,7 @@ import com.evolveum.midpoint.client.api.exception.CommonException;
 import com.evolveum.midpoint.client.api.exception.ObjectAlreadyExistsException;
 import com.evolveum.midpoint.client.api.exception.OperationInProgressException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
@@ -16,23 +17,25 @@ import java.util.Map;
  * Description
  * @author jakmor
  */
-public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectTypeWebResource<O> implements ObjectModifyService
+public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectModifyService
 {
 
     private Map<String, Object> modifications;
 
-    public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type)
+    public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid, Map<String, Object> modifications)
     {
-        super(service, type);
+        super(service, type, oid);
+        this.modifications = modifications;
     }
 
     @Override
     public TaskFuture apost() throws AuthorizationException, ObjectAlreadyExistsException
     {
         // if object created (sync):
-        String oid = null;
+        String oid = getOid();
         String restPath = Types.findType(getType()).getRestPath();
-        Response response = getService().getClient().replacePath("/" + restPath).post();
+
+        Response response = getService().getClient().replacePath("/" + restPath + "/" + oid).post(RestUtil.buildModifyObject(modifications, ModificationTypeType.REPLACE));
 
         switch (response.getStatus()) {
             case 400:
@@ -44,9 +47,6 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
                 throw new ObjectAlreadyExistsException(response.getStatusInfo().getReasonPhrase());
             case 201:
             case 202:
-                String location = response.getLocation().toString();
-                String[] locationSegments = location.split(restPath + "/");
-                oid = locationSegments[1];
                 RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
                 return new RestJaxbCompletedFuture<>(ref);
             default:
