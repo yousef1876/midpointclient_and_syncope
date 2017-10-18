@@ -55,11 +55,12 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	
+	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+
 	@BeforeClass
 	public void init() throws IOException {
-		startServer();
+		//startServer();
 	}
 	
 	@Test
@@ -122,19 +123,13 @@ public class TestBasic {
 	}
 
 	@Test
-	public void test005UserDelete() throws Exception{
+	public void test201UserDelete() throws Exception{
 		// SETUP
 		Service service = getService();
 
-		UserType userDelete = new UserType();
-		userDelete.setOid("321");
-
-		ObjectReference<UserType> ref = service.users().add(userDelete).post();
-		assertNotNull("Setup failed, user not added", ref.getOid());
-
 		// WHEN
 		try{
-			service.users().oid("321").delete();
+			service.users().oid("123").delete();
 		}catch(ObjectNotFoundException e){
 			fail("Cannot delete user, user not found");
 		}
