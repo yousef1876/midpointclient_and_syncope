@@ -15,6 +15,7 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import com.evolveum.midpoint.client.api.verb.Delete;
 import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
@@ -22,6 +23,7 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
  * @author semancik
  *
  */
-public interface ObjectService<O extends ObjectType> extends Get<O> {
+public interface ObjectService<O extends ObjectType> extends Get<O>, Delete<O>
+{
 
 }

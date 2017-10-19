@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -158,10 +159,37 @@ public class RestJaxbService implements Service {
 		}
 		
 		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
-			throw new AuthenticationException("Cannot authentication user");
+			throw new AuthenticationException(response.getStatusInfo().getReasonPhrase());
 		}
 		
 		return null;
+	}
+
+	<O extends ObjectType> void deleteObject(final Class<O> type, final String oid) throws ObjectNotFoundException, AuthenticationException {
+		String urlPrefix = RestUtil.subUrl(Types.findType(type).getRestPath(), oid);
+		Response response = client.replacePath(urlPrefix).delete();
+
+		//TODO: Looks like midPoint returns a 204 and not a 200 on success
+		if (Status.OK.getStatusCode() == response.getStatus() ) {
+			//TODO: Do we want to return anything on successful delete or just remove this if block?
+		}
+
+		if (Status.NO_CONTENT.getStatusCode() == response.getStatus() ) {
+			//TODO: Do we want to return anything on successful delete or just remove this if block?
+		}
+
+
+		if (Status.BAD_REQUEST.getStatusCode() == response.getStatus()) {
+			throw new BadRequestException("Bad request");
+		}
+
+		if (Status.NOT_FOUND.getStatusCode() == response.getStatus()) {
+			throw new ObjectNotFoundException("Cannot delete object with oid" + oid + ". Object doesn't exist");
+		}
+
+		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
+			throw new AuthenticationException("Cannot authentication user");
+		}
 	}
 
 	private JAXBContext createJaxbContext() throws JAXBException {

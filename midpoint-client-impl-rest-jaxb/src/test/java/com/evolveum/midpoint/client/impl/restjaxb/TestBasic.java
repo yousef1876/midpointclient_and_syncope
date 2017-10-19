@@ -56,7 +56,7 @@ public class TestBasic {
 	
 	private static Server server;
 	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	
+
 	@BeforeClass
 	public void init() throws IOException {
 		startServer();
@@ -107,6 +107,32 @@ public class TestBasic {
 		}
 		
 	}
+
+	@Test
+	public void test004UserDeleteNotExist() throws Exception{
+		Service service = getService();
+
+		// WHEN
+		try{
+			service.users().oid("999").delete();
+			fail("Unexpected user deleted");
+		}catch(ObjectNotFoundException e){
+			// nothing to do. this is expected
+		}
+	}
+
+	@Test
+	public void test201UserDelete() throws Exception{
+		// SETUP
+		Service service = getService();
+
+		// WHEN
+		try{
+			service.users().oid("123").delete();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot delete user, user not found");
+		}
+	}
 	
 	@Test
 	public void test010UserSearch() throws Exception {
@@ -152,9 +178,8 @@ public class TestBasic {
 			} else {
 				qa.setQans("I do NOT have FAVORITE c0l0r!");
 			}
-			
+
 		}
-		
 		
 		service = (RestJaxbService) getService("administrator", challenge.getAnswer());
 		

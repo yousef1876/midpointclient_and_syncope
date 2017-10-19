@@ -15,12 +15,14 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import com.evolveum.midpoint.client.api.ObjectAddService;
 import com.evolveum.midpoint.client.api.ObjectReference;
 import com.evolveum.midpoint.client.api.TaskFuture;
 import com.evolveum.midpoint.client.api.exception.AuthorizationException;
+import com.evolveum.midpoint.client.api.exception.ObjectAlreadyExistsException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
@@ -38,7 +40,7 @@ public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObje
 	}
 
 	@Override
-	public TaskFuture<ObjectReference<O>> apost() throws AuthorizationException {
+	public TaskFuture<ObjectReference<O>> apost() throws AuthorizationException, ObjectAlreadyExistsException {
 		// TODO: add object
 		
 		// if object created (sync):
@@ -47,9 +49,14 @@ public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObje
 		Response response = getService().getClient().replacePath("/" + restPath).post(object);
 		
 		switch (response.getStatus()) {
+			case 400:
+				throw new BadRequestException(response.getStatusInfo().getReasonPhrase());
 			case 401:
 			case 403:
 				throw new AuthorizationException(response.getStatusInfo().getReasonPhrase());
+			case 409:
+				throw new ObjectAlreadyExistsException(response.getStatusInfo().getReasonPhrase());
+			case 201:
 			case 202:
 				String location = response.getLocation().toString();
 				String[] locationSegments = location.split(restPath + "/");
@@ -59,8 +66,8 @@ public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObje
 		default:
 			throw new UnsupportedOperationException("Implement other status codes, unsupported return status: " + response.getStatus());
 		}
-				
+
 	}
-	
+
 	
 }
