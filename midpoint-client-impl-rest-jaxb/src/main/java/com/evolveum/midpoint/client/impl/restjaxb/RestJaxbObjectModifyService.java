@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 /**
- * Description
  * @author jakmor
  */
 public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectModifyService<O>
@@ -44,8 +43,8 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
                 throw new AuthorizationException(response.getStatusInfo().getReasonPhrase());
             case 409:
                 throw new ObjectAlreadyExistsException(response.getStatusInfo().getReasonPhrase());
-            case 201:
-            case 202:
+                //TODO: Do we want to return a reference? Might be useful.
+            case 204:
                 RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
                 return new RestJaxbCompletedFuture<>(ref);
             default:
