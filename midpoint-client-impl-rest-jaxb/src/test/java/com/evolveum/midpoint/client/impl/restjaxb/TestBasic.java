@@ -128,37 +128,35 @@ public class TestBasic {
 	public void test005UserModify() throws Exception{
 		Service service = getService();
 
+
 		Map<String, Object> modifications = new HashMap<>();
 		modifications.put("description", "test description");
 
-		// WHEN
-		try{
-			service.users().oid("123").modify(modifications).apost();
-		}catch(ObjectNotFoundException e){
-			fail("Bulk modification failed: " + e.getMessage());
-		}
+		ObjectReference<UserType> ref = service.users().oid("123").modify(modifications).post();
 
-		try{
-			service.users().oid("123").modify()
+		assertEquals(ref.getObject().getDescription(), "test description");
+
+		/*ref = service.users().oid("123").modify()
 					.add("givenName", service.util().createPoly("Example given name"))
-					.add("lastName", service.util().createPoly("Example last name"))
-					.apost();
-		}catch(ObjectNotFoundException e){
-			fail("Modification failed: " + e.getMessage());
-		}
+					.post();
+
+		UserType userType = ref.getObject();
+
+		assertEquals(userType.getGivenName().toString(), "Example given name");*/
+
 	}
 
 	@Test
 	public void test201UserDelete() throws Exception{
-		// SETUP
-	/*	Service service = getService();
-
-		// WHEN
-		try{
-			service.users().oid("123").delete();
-		}catch(ObjectNotFoundException e){
-			fail("Cannot delete user, user not found");
-		}*/
+//		// SETUP
+//		Service service = getService();
+//
+//		// WHEN
+//		try{
+//			service.users().oid("123").delete();
+//		}catch(ObjectNotFoundException e){
+//			fail("Cannot delete user, user not found");
+//		}
 	}
 	
 	@Test
