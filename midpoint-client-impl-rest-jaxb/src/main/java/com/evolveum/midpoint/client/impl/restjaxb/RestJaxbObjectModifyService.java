@@ -17,7 +17,7 @@ import java.util.Map;
  * Description
  * @author jakmor
  */
-public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectModifyService
+public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectModifyService<O>
 {
 
     private Map<String, Object> modifications;
@@ -31,11 +31,10 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
     @Override
     public TaskFuture apost() throws AuthorizationException, ObjectAlreadyExistsException
     {
-        // if object created (sync):
         String oid = getOid();
-        String restPath = Types.findType(getType()).getRestPath();
+        String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
 
-        Response response = getService().getClient().replacePath("/" + restPath + "/" + oid).post(RestUtil.buildModifyObject(modifications, ModificationTypeType.REPLACE));
+        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildModifyObject(modifications, ModificationTypeType.ADD));
 
         switch (response.getStatus()) {
             case 400:

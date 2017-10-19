@@ -21,7 +21,9 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -55,11 +57,12 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
-		startServer();
+		//startServer();
 	}
 	
 	@Test
@@ -125,25 +128,30 @@ public class TestBasic {
 	public void test005UserModify() throws Exception{
 		Service service = getService();
 
+		Map<String, Object> modifications = new HashMap<>();
+
+		modifications.put("description", "test description");
+
 		// WHEN
 		try{
 			//TODO: service.users().oid("123").modify();
+			service.users().oid("123").modify(modifications).apost();
 		}catch(Exception e){
-
+			fail("Modification failed: " + e.getMessage());
 		}
 	}
 
 	@Test
 	public void test201UserDelete() throws Exception{
 		// SETUP
-		Service service = getService();
+	/*	Service service = getService();
 
 		// WHEN
 		try{
 			service.users().oid("123").delete();
 		}catch(ObjectNotFoundException e){
 			fail("Cannot delete user, user not found");
-		}
+		}*/
 	}
 	
 	@Test
