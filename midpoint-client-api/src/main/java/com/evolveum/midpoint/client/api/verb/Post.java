@@ -64,6 +64,6 @@ public interface Post<T> {
 	 * Potentially asynchronous POST.
 	 * @throws AuthorizationException 
 	 */
-	TaskFuture<T> apost() throws AuthorizationException, ObjectAlreadyExistsException;
+	TaskFuture<T> apost() throws CommonException;
 	
 }

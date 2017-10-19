@@ -129,24 +129,21 @@ public class TestBasic {
 		Service service = getService();
 
 		Map<String, Object> modifications = new HashMap<>();
-
 		modifications.put("description", "test description");
 
 		// WHEN
 		try{
-			//TODO: service.users().oid("123").modify();
 			service.users().oid("123").modify(modifications).apost();
-		}catch(Exception e){
-			fail("Modification failed: " + e.getMessage());
+		}catch(ObjectNotFoundException e){
+			fail("Bulk modification failed: " + e.getMessage());
 		}
 
 		try{
-			//TODO: service.users().oid("123").modify();
 			service.users().oid("123").modify()
 					.add("givenName", service.util().createPoly("Example given name"))
 					.add("lastName", service.util().createPoly("Example last name"))
 					.apost();
-		}catch(Exception e){
+		}catch(ObjectNotFoundException e){
 			fail("Modification failed: " + e.getMessage());
 		}
 	}

@@ -2,10 +2,7 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.TaskFuture;
-import com.evolveum.midpoint.client.api.exception.AuthorizationException;
-import com.evolveum.midpoint.client.api.exception.CommonException;
-import com.evolveum.midpoint.client.api.exception.ObjectAlreadyExistsException;
-import com.evolveum.midpoint.client.api.exception.OperationInProgressException;
+import com.evolveum.midpoint.client.api.exception.*;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 
@@ -41,7 +38,7 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
     }
 
     @Override
-    public TaskFuture apost() throws AuthorizationException, ObjectAlreadyExistsException
+    public TaskFuture apost() throws AuthorizationException, ObjectNotFoundException
     {
         String oid = getOid();
         String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
@@ -54,9 +51,9 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
             case 401:
             case 403:
                 throw new AuthorizationException(response.getStatusInfo().getReasonPhrase());
-            case 409:
-                throw new ObjectAlreadyExistsException(response.getStatusInfo().getReasonPhrase());
                 //TODO: Do we want to return a reference? Might be useful.
+            case 404:
+                throw new ObjectNotFoundException(response.getStatusInfo().getReasonPhrase());
             case 204:
                 RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
                 return new RestJaxbCompletedFuture<>(ref);
