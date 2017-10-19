@@ -11,6 +11,7 @@ import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,10 +22,22 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
 
     private Map<String, Object> modifications;
 
+    public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid)
+    {
+
+        this(service, type, oid, new HashMap<String, Object>());
+    }
+
+
     public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid, Map<String, Object> modifications)
     {
         super(service, type, oid);
         this.modifications = modifications;
+    }
+
+    public RestJaxbObjectModifyService<O> add(String path, Object value){
+        modifications.put(path, value);
+        return this;
     }
 
     @Override

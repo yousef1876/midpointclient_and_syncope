@@ -30,4 +30,5 @@ import java.util.Map;
 public interface ObjectService<O extends ObjectType> extends Get<O>, Delete<O>
 {
     ObjectModifyService<O> modify(Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException;
+    ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException;
 }

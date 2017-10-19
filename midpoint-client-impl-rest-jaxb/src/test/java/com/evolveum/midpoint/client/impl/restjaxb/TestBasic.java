@@ -139,6 +139,16 @@ public class TestBasic {
 		}catch(Exception e){
 			fail("Modification failed: " + e.getMessage());
 		}
+
+		try{
+			//TODO: service.users().oid("123").modify();
+			service.users().oid("123").modify()
+					.add("givenName", service.util().createPoly("Example given name"))
+					.add("lastName", service.util().createPoly("Example last name"))
+					.apost();
+		}catch(Exception e){
+			fail("Modification failed: " + e.getMessage());
+		}
 	}
 
 	@Test

@@ -50,4 +50,9 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	{
 		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid(), modifications);
 	}
+
+	public ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException
+	{
+		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid());
+	}
 }
