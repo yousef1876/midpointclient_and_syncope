@@ -32,13 +32,13 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
         this.modifications = modifications;
     }
 
-    public RestJaxbObjectModifyService<O> add(String path, Object value){
-        modifications.put(path, value);
+    public RestJaxbObjectModifyService<O> item(String path, Object value){
+        this.modifications.put(path, value);
         return this;
     }
 
     @Override
-    public TaskFuture apost() throws AuthorizationException, ObjectNotFoundException
+    public TaskFuture apost() throws AuthorizationException, ObjectNotFoundException, AuthenticationException
     {
         String oid = getOid();
         String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
@@ -46,17 +46,18 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
         Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildModifyObject(modifications, ModificationTypeType.ADD));
 
         switch (response.getStatus()) {
+            case 204:
+                RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
+                return new RestJaxbCompletedFuture<>(ref);
             case 400:
                 throw new BadRequestException(response.getStatusInfo().getReasonPhrase());
             case 401:
+                throw new AuthenticationException(response.getStatusInfo().getReasonPhrase());
             case 403:
                 throw new AuthorizationException(response.getStatusInfo().getReasonPhrase());
                 //TODO: Do we want to return a reference? Might be useful.
             case 404:
                 throw new ObjectNotFoundException(response.getStatusInfo().getReasonPhrase());
-            case 204:
-                RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
-                return new RestJaxbCompletedFuture<>(ref);
             default:
                 throw new UnsupportedOperationException("Implement other status codes, unsupported return status: " + response.getStatus());
         }

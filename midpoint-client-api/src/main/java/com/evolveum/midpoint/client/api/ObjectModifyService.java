@@ -10,5 +10,5 @@ import java.util.Map;
  */
 public interface ObjectModifyService <O extends ObjectType> extends Post<ObjectReference<O>>{
 
-    ObjectModifyService<O> add(String path, Object value);
+    ObjectModifyService<O> item(String path, Object value);
 }

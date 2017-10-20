@@ -41,7 +41,7 @@ public class RestJaxbObjectAddService<O extends ObjectType> extends AbstractObje
 
 	@Override
 	public TaskFuture<ObjectReference<O>> apost() throws AuthorizationException, ObjectAlreadyExistsException {
-		// TODO: add object
+		// TODO: item object
 		
 		// if object created (sync):
 		String oid = null;

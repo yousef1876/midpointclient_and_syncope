@@ -33,7 +33,7 @@ public class RestUtil {
 		return "/" + urlPrefix + "/" + pathSegment;
 	}
 
-	//TODO: If these work, add to interface
+	//TODO: If these work, item to interface
 	public static ObjectModificationType buildModifyObject(String path, Object value, ModificationTypeType modificationType)
 	{
 		ObjectModificationType objectModificationType = new ObjectModificationType();

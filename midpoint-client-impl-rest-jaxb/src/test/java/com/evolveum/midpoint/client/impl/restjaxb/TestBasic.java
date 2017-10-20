@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.evolveum.midpoint.client.api.ServiceUtil;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -43,10 +44,6 @@ import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.impl.restjaxb.service.AuthenticationProvider;
 import com.evolveum.midpoint.client.impl.restjaxb.service.MidpointMockRestService;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationStatusType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.AssignmentType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
@@ -57,12 +54,12 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
-		//startServer();
+		startServer();
 	}
 	
 	@Test
@@ -127,36 +124,34 @@ public class TestBasic {
 	@Test
 	public void test005UserModify() throws Exception{
 		Service service = getService();
-
+		ServiceUtil util = service.util();
 
 		Map<String, Object> modifications = new HashMap<>();
 		modifications.put("description", "test description");
 
-		ObjectReference<UserType> ref = service.users().oid("123").modify(modifications).post();
+		ObjectReference<UserType> ref = service.users().oid("123")
+				.modify(modifications) //TODO: Is this getting overwritten?
+				.item("givenName", util.createPoly("Charlie"))
+				.post();
 
-		assertEquals(ref.getObject().getDescription(), "test description");
+		UserType user = ref.get();
 
-		/*ref = service.users().oid("123").modify()
-					.add("givenName", service.util().createPoly("Example given name"))
-					.post();
+		assertEquals(user.getDescription(), "test description");
 
-		UserType userType = ref.getObject();
-
-		assertEquals(userType.getGivenName().toString(), "Example given name");*/
-
+		assertEquals(util.getOrig(user.getGivenName()), "Charlie");
 	}
 
 	@Test
 	public void test201UserDelete() throws Exception{
-//		// SETUP
-//		Service service = getService();
-//
-//		// WHEN
-//		try{
-//			service.users().oid("123").delete();
-//		}catch(ObjectNotFoundException e){
-//			fail("Cannot delete user, user not found");
-//		}
+		// SETUP
+		Service service = getService();
+
+		// WHEN
+		try{
+			service.users().oid("123").delete();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot delete user, user not found");
+		}
 	}
 	
 	@Test
@@ -174,17 +169,12 @@ public class TestBasic {
 //		ActivationType activation = new ActivationType();
 //		activation.setAdministrativeStatus(ActivationStatusType.ARCHIVED);
 //		cal.setActivation(activation);
-		
-		
-		
 		SearchResult<UserType> result = service.users().search().queryFor(UserType.class).item(itemPath).eq("jack").finishQuery().get();
 		
 		// THEN
 		assertEquals(result.size(), 0);
 	}
-	
-	
-	
+
 	@Test
 	public void test100challengeRepsonse() throws Exception {
 		RestJaxbService service = (RestJaxbService) getService("administrator", "", AuthenticationType.SECQ);
