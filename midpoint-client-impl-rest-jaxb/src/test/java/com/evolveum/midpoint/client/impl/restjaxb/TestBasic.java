@@ -129,10 +129,16 @@ public class TestBasic {
 		Map<String, Object> modifications = new HashMap<>();
 		modifications.put("description", "test description");
 
-		ObjectReference<UserType> ref = service.users().oid("123")
-				.modify(modifications) //TODO: Is this getting overwritten?
+		ObjectReference<UserType> ref = null;
+
+		try{
+			ref	= service.users().oid("123")
+				.modify(modifications)
 				.item("givenName", util.createPoly("Charlie"))
 				.post();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot modify user, user not found");
+		}
 
 		UserType user = ref.get();
 

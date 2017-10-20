@@ -115,6 +115,8 @@ public class MidpointMockRestService {
 	                                                        @QueryParam("options") List<String> options,
 	                                                        @Context UriInfo uriInfo, @Context MessageContext mc) {
 
+		//TODO: Should we make this generic or does this satisfy our needs for the test case?
+
 		RestJaxbServiceUtil util = new RestJaxbServiceUtil();
 		OperationResultType result = new OperationResultType();
 		result.setOperation("Modify object");
@@ -127,16 +129,15 @@ public class MidpointMockRestService {
 			return RestMockServiceUtil.createResponse(Status.NOT_FOUND, result);
 		}
 
+		//Grab changes from the ObjectModificationType
 		List<ItemDeltaType> deltaTypeList = object.getItemDelta();
+
 		ItemDeltaType delta1 = deltaTypeList.get(1);
 		String description = delta1.getValue().get(0).toString();
 		objectType.setDescription(description);
 
 		ItemDeltaType delta2 = deltaTypeList.get(0);
-		//String description = delta2.getValue().get(0);
 		objectType.setGivenName((PolyStringType)delta2.getValue().get(0));
-		//objectType.setDescription(deltaTypeList.get(0).getValue().get(0).toString());
-		//objectType.setGivenName((PolyStringType)deltaTypeList.get(1).getValue().get(0));
 
 		return Response.status(Status.NO_CONTENT).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
 

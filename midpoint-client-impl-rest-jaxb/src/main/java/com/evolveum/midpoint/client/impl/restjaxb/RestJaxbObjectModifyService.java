@@ -22,7 +22,7 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
     public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid)
     {
 
-        this(service, type, oid, new HashMap<String, Object>());
+        this(service, type, oid, new HashMap<>());
     }
 
 
@@ -32,6 +32,7 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
         this.modifications = modifications;
     }
 
+    @Override
     public RestJaxbObjectModifyService<O> item(String path, Object value){
         this.modifications.put(path, value);
         return this;
