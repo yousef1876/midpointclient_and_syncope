@@ -34,6 +34,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.client.impl.restjaxb.RestJaxbServiceUtil;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
+import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
@@ -89,7 +95,7 @@ public class MidpointMockRestService {
 			@Context MessageContext mc){
 		
 		OperationResultType result = new OperationResultType();
-		result.setOperation("Get object");;
+		result.setOperation("Get object");
 		T objectType = (T) objectMap.get(type).get(id);
 		
 		if (objectType == null) {
@@ -100,6 +106,41 @@ public class MidpointMockRestService {
 		
 		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
 		
+	}
+
+	@POST
+	@Path("/{type}/{id}")
+	@Produces({MediaType.APPLICATION_XML})
+	public <T extends ObjectType> Response modifyObjectPost(@PathParam("type") String type, @PathParam("id") String id, ObjectModificationType object,
+	                                                        @QueryParam("options") List<String> options,
+	                                                        @Context UriInfo uriInfo, @Context MessageContext mc) {
+
+		//TODO: Should we make this generic or does this satisfy our needs for the test case?
+
+		RestJaxbServiceUtil util = new RestJaxbServiceUtil();
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Modify object");
+
+		UserType objectType = (UserType) objectMap.get(type).get(id);
+
+		if (objectType == null) {
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("User with oid " + id + " not found");
+			return RestMockServiceUtil.createResponse(Status.NOT_FOUND, result);
+		}
+
+		//Grab changes from the ObjectModificationType
+		List<ItemDeltaType> deltaTypeList = object.getItemDelta();
+
+		ItemDeltaType delta1 = deltaTypeList.get(1);
+		String description = delta1.getValue().get(0).toString();
+		objectType.setDescription(description);
+
+		ItemDeltaType delta2 = deltaTypeList.get(0);
+		objectType.setGivenName((PolyStringType)delta2.getValue().get(0));
+
+		return Response.status(Status.NO_CONTENT).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
+
 	}
 
 	@DELETE
