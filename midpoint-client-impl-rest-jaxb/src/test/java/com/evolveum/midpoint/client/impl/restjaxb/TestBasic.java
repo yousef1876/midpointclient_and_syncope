@@ -21,11 +21,14 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.evolveum.midpoint.client.api.ServiceUtil;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -41,10 +44,6 @@ import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.impl.restjaxb.service.AuthenticationProvider;
 import com.evolveum.midpoint.client.impl.restjaxb.service.MidpointMockRestService;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationStatusType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.AssignmentType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
@@ -56,6 +55,7 @@ public class TestBasic {
 	
 	private static Server server;
 	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
@@ -122,6 +122,32 @@ public class TestBasic {
 	}
 
 	@Test
+	public void test005UserModify() throws Exception{
+		Service service = getService();
+		ServiceUtil util = service.util();
+
+		Map<String, Object> modifications = new HashMap<>();
+		modifications.put("description", "test description");
+
+		ObjectReference<UserType> ref = null;
+
+		try{
+			ref	= service.users().oid("123")
+				.modify(modifications)
+				.item("givenName", util.createPoly("Charlie"))
+				.post();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot modify user, user not found");
+		}
+
+		UserType user = ref.get();
+
+		assertEquals(user.getDescription(), "test description");
+
+		assertEquals(util.getOrig(user.getGivenName()), "Charlie");
+	}
+
+	@Test
 	public void test201UserDelete() throws Exception{
 		// SETUP
 		Service service = getService();
@@ -149,17 +175,12 @@ public class TestBasic {
 //		ActivationType activation = new ActivationType();
 //		activation.setAdministrativeStatus(ActivationStatusType.ARCHIVED);
 //		cal.setActivation(activation);
-		
-		
-		
 		SearchResult<UserType> result = service.users().search().queryFor(UserType.class).item(itemPath).eq("jack").finishQuery().get();
 		
 		// THEN
 		assertEquals(result.size(), 0);
 	}
-	
-	
-	
+
 	@Test
 	public void test100challengeRepsonse() throws Exception {
 		RestJaxbService service = (RestJaxbService) getService("administrator", "", AuthenticationType.SECQ);
