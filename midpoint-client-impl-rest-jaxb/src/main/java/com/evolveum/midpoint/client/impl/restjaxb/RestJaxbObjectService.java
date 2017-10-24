@@ -15,6 +15,7 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import com.evolveum.midpoint.client.api.ObjectGenerateService;
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.ObjectService;
 import com.evolveum.midpoint.client.api.exception.AuthenticationException;
@@ -38,7 +39,6 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 		return getService().getObject(getType(), getOid());
 	}
 
-
 	@Override
 	public void delete() throws ObjectNotFoundException, AuthenticationException
 	{
@@ -55,5 +55,9 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	public ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException
 	{
 		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid());
+	}
+
+	public ObjectGenerateService<O> generateService() throws ObjectNotFoundException, AuthenticationException{
+		return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid());
 	}
 }

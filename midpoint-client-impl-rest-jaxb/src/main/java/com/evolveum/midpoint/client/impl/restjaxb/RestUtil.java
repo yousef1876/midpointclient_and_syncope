@@ -16,10 +16,15 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemTargetType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 
+import javax.xml.namespace.QName;
 import java.util.Map;
 
 /**
@@ -27,6 +32,8 @@ import java.util.Map;
  *
  */
 public class RestUtil {
+
+	private final String NS_COMMON = "http://midpoint.evolveum.com/xml/ns/public/common/common-3";
 	
 	public static String subUrl(final String urlPrefix, final String pathSegment) {
 		// TODO: better code (e.g. escaping)
@@ -72,6 +79,39 @@ public class RestUtil {
 
 		return itemDeltaType;
 	}
+
+	private PolicyItemsDefinitionType buildGenerateObject(String policyOid, String targetPath, Boolean execute)
+	{
+		PolicyItemsDefinitionType policyItemsDefinitionType = new PolicyItemsDefinitionType();
+		PolicyItemDefinitionType policyItemDefinitionType = new PolicyItemDefinitionType();
+
+		//Set target path
+		ItemPathType itemPathType = new ItemPathType();
+		itemPathType.setValue(targetPath);
+		PolicyItemTargetType targetType = new PolicyItemTargetType();
+		targetType.setPath(itemPathType);
+		policyItemDefinitionType.setTarget(targetType);
+
+		//Set valuePolicyRef
+		policyItemDefinitionType.setValuePolicyRef(buildValuePolicyRef(policyOid));
+
+		//Set Execute
+		policyItemDefinitionType.setExecute(execute);
+
+		policyItemsDefinitionType.getPolicyItemDefinition().add(policyItemDefinitionType);
+		return policyItemsDefinitionType;
+	}
+
+	private ObjectReferenceType buildValuePolicyRef(String policyOid)
+	{
+		ObjectReferenceType objectReferenceType = new ObjectReferenceType();
+		objectReferenceType.setOid(policyOid);
+		QName qname = new QName(NS_COMMON, "ValuePolicyType");
+		objectReferenceType.setType(qname);
+		return objectReferenceType;
+	}
+
+
 	
 
 }

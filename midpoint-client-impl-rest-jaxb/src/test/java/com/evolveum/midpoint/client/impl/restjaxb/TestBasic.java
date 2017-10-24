@@ -148,7 +148,7 @@ public class TestBasic {
 	}
 
 	@Test
-	public void test201UserDelete() throws Exception{
+	public void test900UserDelete() throws Exception{
 		// SETUP
 		Service service = getService();
 
@@ -242,6 +242,32 @@ public class TestBasic {
 		
 		
 	}
+
+/*	@Test
+	public void test201generateExplicit() throws Exception
+	{
+		Service service = getService();
+
+
+		service.users().oid("123").generate().policy().post();
+	}
+
+	@Test
+	public void test202generateImplicit() throws Exception
+	{
+		Service service = getService();
+
+		service.users().oid("123").generate().path().post();
+	}
+
+	@Test
+	public void test203generateExecute() throws Exception
+	{
+		Service service = getService();
+
+		service.users().oid("123").generate().path().execute.post();
+	}*/
+
 	
 private Service getService() throws IOException {
 		
