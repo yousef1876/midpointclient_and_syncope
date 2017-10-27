@@ -15,21 +15,13 @@
  */
 package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 /**
- * @author semancik
+ * @author jakmor
  *
  */
-public interface Service {
-	
-	// TODO
-//	ProxyService proxy();
-
-	ObjectCollectionService<UserType> users();
-
-	PolicyCollectionService<ValuePolicyType> valuePolicies();
-	
-	ServiceUtil util();
+public interface PolicyCollectionService<O extends ObjectType> extends ObjectCollectionService<O> {
+	@Override
+	PolicyService<O> oid(String oid);
 }

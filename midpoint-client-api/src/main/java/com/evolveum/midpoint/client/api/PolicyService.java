@@ -15,21 +15,22 @@
  */
 package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
+import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
+import com.evolveum.midpoint.client.api.verb.Delete;
+import com.evolveum.midpoint.client.api.verb.Get;
+import com.evolveum.midpoint.client.api.verb.Post;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.OperationResultType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 
+import java.util.Map;
+
 /**
- * @author semancik
+ * @author jakmor
  *
  */
-public interface Service {
-	
-	// TODO
-//	ProxyService proxy();
-
-	ObjectCollectionService<UserType> users();
-
-	PolicyCollectionService<ValuePolicyType> valuePolicies();
-	
-	ServiceUtil util();
+public interface PolicyService<O extends ObjectType> extends ObjectService<O>
+{
+    PolicyGenerateService generate();
 }

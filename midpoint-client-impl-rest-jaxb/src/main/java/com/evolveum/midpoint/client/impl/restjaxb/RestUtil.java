@@ -23,8 +23,12 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import com.sun.org.apache.xerces.internal.dom.TextImpl;
 
+import javax.ws.rs.core.AbstractMultivaluedMap;
 import javax.xml.namespace.QName;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,7 +120,14 @@ public class RestUtil {
 		return objectReferenceType;
 	}
 
-
+	public static String getPolicyItemsDefValue(PolicyItemsDefinitionType policyItems){
+		List<PolicyItemDefinitionType> resultList = policyItems.getPolicyItemDefinition();
+		PolicyItemDefinitionType policyItemDefinitionType = resultList.get(0);
+		//Why cant getValue just return the string value? :(
+		ElementNSImpl elementNSImpl = (ElementNSImpl) policyItemDefinitionType.getValue();
+		TextImpl textImpl = (TextImpl) elementNSImpl.getFirstChild();
+		return textImpl.getData();
+	}
 	
 
 }

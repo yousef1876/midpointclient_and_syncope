@@ -251,16 +251,23 @@ public class TestBasic {
 	}
 
 	@Test
-	public void test201generateExplicit() throws Exception
+	public void test201modifyGenerate() throws Exception
 	{
 		Service service = getService();
 
 		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("credentials/password/value").post();
 		UserType user = userRef.get();
 		ProtectedStringType password = user.getCredentials().getPassword().getValue();
-		password.getContent().get(0).toString();
 
-		System.out.println(password.getContent().get(0).toString());
+		//TODO: Finish test
+	}
+
+	@Test
+	public void test201policyGenerate() throws Exception
+	{
+		Service service = getService();
+		String generatedPassword = service.valuePolicies().oid("00000000-0000-0000-0000-000000000003").generate().post();
+		assertNotNull(generatedPassword);
 	}
 /*
 	@Test

@@ -30,6 +30,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.evolveum.midpoint.client.api.PolicyCollectionService;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -137,6 +139,10 @@ public class RestJaxbService implements Service {
 		return new RestJaxbObjectCollectionService<>(this, URL_PREFIX_USERS, UserType.class);
 	}
 
+	@Override
+	public PolicyCollectionService<ValuePolicyType> valuePolicies() {
+		return new RestJaxbPolicyCollectionService<>(this, URL_PREFIX_USERS, ValuePolicyType.class);
+	}
 	@Override
 	public ServiceUtil util() {
 		return util;
