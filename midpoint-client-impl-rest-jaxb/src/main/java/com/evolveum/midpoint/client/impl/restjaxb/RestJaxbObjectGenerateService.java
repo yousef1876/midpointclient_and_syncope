@@ -6,6 +6,7 @@ import com.evolveum.midpoint.client.api.TaskFuture;
 import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.AuthorizationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 import com.sun.org.apache.xpath.internal.functions.FuncSubstring;
@@ -57,13 +58,13 @@ public class RestJaxbObjectGenerateService<O extends ObjectType> extends Abstrac
     {
         String oid = getOid();
         String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
-
-        Response response = getService().getClient().replacePath(restPath).post("");
+        restPath += "/generate";
+        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildGenerateObject(this.policyOid, this.path, this.execute));
 
         switch (response.getStatus()) {
-            case 204:
-                RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
-                return new RestJaxbCompletedFuture<>(ref);
+            case 200:
+                PolicyItemsDefinitionType generationResult = response.readEntity(PolicyItemsDefinitionType.class);
+                return new RestJaxbCompletedFuture<>(generationResult);
             case 400:
                 throw new BadRequestException(response.getStatusInfo().getReasonPhrase());
             case 401:
@@ -76,9 +77,5 @@ public class RestJaxbObjectGenerateService<O extends ObjectType> extends Abstrac
             default:
                 throw new UnsupportedOperationException("Implement other status codes, unsupported return status: " + response.getStatus());
         }
-    }
-
-    private buildPolicyItemsDefinition(){
-
     }
 }

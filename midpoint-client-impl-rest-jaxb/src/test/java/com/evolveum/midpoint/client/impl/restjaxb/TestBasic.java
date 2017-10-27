@@ -25,15 +25,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import com.sun.org.apache.xerces.internal.dom.TextImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.transport.local.LocalConduit;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -54,12 +60,12 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
-		startServer();
+		//startServer();
 	}
 	
 	@Test
@@ -243,15 +249,24 @@ public class TestBasic {
 		
 	}
 
-/*	@Test
+	@Test
 	public void test201generateExplicit() throws Exception
 	{
 		Service service = getService();
 
 
-		service.users().oid("123").generate().policy().post();
-	}
+		 PolicyItemsDefinitionType result = service.users().oid("123").generate().post();
 
+		List<PolicyItemDefinitionType> resultList = result.getPolicyItemDefinition();
+		PolicyItemDefinitionType policyItemDefinitionType = resultList.get(0);
+		//Why cant getValue just return the string value? :(
+		ElementNSImpl elementNSImpl = (ElementNSImpl) policyItemDefinitionType.getValue();
+		TextImpl textImpl = (TextImpl) elementNSImpl.getFirstChild();
+		String value = textImpl.getData();
+
+		System.out.println(value);
+	}
+/*
 	@Test
 	public void test202generateImplicit() throws Exception
 	{

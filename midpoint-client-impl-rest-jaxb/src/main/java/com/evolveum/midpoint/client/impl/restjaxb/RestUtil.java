@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class RestUtil {
 
-	private final String NS_COMMON = "http://midpoint.evolveum.com/xml/ns/public/common/common-3";
+	private static final String NS_COMMON = "http://midpoint.evolveum.com/xml/ns/public/common/common-3";
 	
 	public static String subUrl(final String urlPrefix, final String pathSegment) {
 		// TODO: better code (e.g. escaping)
@@ -80,7 +80,7 @@ public class RestUtil {
 		return itemDeltaType;
 	}
 
-	private PolicyItemsDefinitionType buildGenerateObject(String policyOid, String targetPath, Boolean execute)
+	public static PolicyItemsDefinitionType buildGenerateObject(String policyOid, String targetPath, Boolean execute)
 	{
 		PolicyItemsDefinitionType policyItemsDefinitionType = new PolicyItemsDefinitionType();
 		PolicyItemDefinitionType policyItemDefinitionType = new PolicyItemDefinitionType();
@@ -102,7 +102,7 @@ public class RestUtil {
 		return policyItemsDefinitionType;
 	}
 
-	private ObjectReferenceType buildValuePolicyRef(String policyOid)
+	private static ObjectReferenceType buildValuePolicyRef(String policyOid)
 	{
 		ObjectReferenceType objectReferenceType = new ObjectReferenceType();
 		objectReferenceType.setOid(policyOid);

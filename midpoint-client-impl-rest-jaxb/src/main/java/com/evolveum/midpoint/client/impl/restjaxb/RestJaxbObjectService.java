@@ -57,7 +57,8 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid());
 	}
 
-	public ObjectGenerateService<O> generateService() throws ObjectNotFoundException, AuthenticationException{
+	@Override
+	public ObjectGenerateService<O> generate() throws ObjectNotFoundException, AuthenticationException{
 		return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid());
 	}
 }
