@@ -61,4 +61,6 @@ public class RestJaxbServiceUtil implements ServiceUtil {
 		Arrays.asList(qname).forEach(name -> itemPathType.setValue(itemPathType + "/" + name.getLocalPart()));
 		return itemPathType;
 	}
+
+
 }

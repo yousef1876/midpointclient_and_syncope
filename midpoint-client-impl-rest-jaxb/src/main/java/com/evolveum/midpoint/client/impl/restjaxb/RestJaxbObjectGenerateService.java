@@ -22,34 +22,14 @@ import java.util.Map;
 public class RestJaxbObjectGenerateService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectGenerateService<O>
 {
 
-    private static final String DEFAULT_PASS_POLICY_OID ="00000000-0000-0000-0000-000000000003";
-    private static final String DEFAULT_PASS_PATH = "/credentials/password/value";
 
-    private boolean execute = false;
-    private String path = DEFAULT_PASS_PATH ;
-    private String policyOid = DEFAULT_PASS_POLICY_OID;
+    private String path;
 
-    public RestJaxbObjectGenerateService(RestJaxbService service, Class<O> type, String oid)
+
+    public RestJaxbObjectGenerateService(RestJaxbService service, Class<O> type, String oid, String path)
     {
         super(service, type, oid);
-    }
-
-    @Override
-    public ObjectGenerateService<O> execute(){
-        this.execute = true;
-        return this;
-    }
-
-    @Override
-    public ObjectGenerateService<O> path(String path){
         this.path = path;
-        return this;
-    }
-
-    @Override
-    public ObjectGenerateService<O> policy(String policyOid){
-        this.policyOid = policyOid;
-        return this;
     }
 
 
@@ -59,12 +39,12 @@ public class RestJaxbObjectGenerateService<O extends ObjectType> extends Abstrac
         String oid = getOid();
         String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
         restPath += "/generate";
-        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildGenerateObject(this.policyOid, this.path, this.execute));
+        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildGenerateObject(this.path, true));
 
         switch (response.getStatus()) {
             case 200:
-                PolicyItemsDefinitionType generationResult = response.readEntity(PolicyItemsDefinitionType.class);
-                return new RestJaxbCompletedFuture<>(generationResult);
+                RestJaxbObjectReference<O> ref = new RestJaxbObjectReference<>(getService(), getType(), oid);
+                return new RestJaxbCompletedFuture<>(ref);
             case 400:
                 throw new BadRequestException(response.getStatusInfo().getReasonPhrase());
             case 401:

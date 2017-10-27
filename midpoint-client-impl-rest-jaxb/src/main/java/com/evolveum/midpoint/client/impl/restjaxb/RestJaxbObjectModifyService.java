@@ -1,5 +1,6 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import com.evolveum.midpoint.client.api.ObjectGenerateService;
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.TaskFuture;
 import com.evolveum.midpoint.client.api.exception.*;
@@ -36,6 +37,12 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
     public RestJaxbObjectModifyService<O> item(String path, Object value){
         this.modifications.put(path, value);
         return this;
+    }
+
+
+    @Override
+    public ObjectGenerateService<O> generate(String path) throws ObjectNotFoundException, AuthenticationException{
+        return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid(), path);
     }
 
     @Override

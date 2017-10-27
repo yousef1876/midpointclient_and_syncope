@@ -79,6 +79,9 @@ public class RestUtil {
 
 		return itemDeltaType;
 	}
+	public static PolicyItemsDefinitionType buildGenerateObject(String targetPath, Boolean execute){
+		return buildGenerateObject("", targetPath,execute);
+	}
 
 	public static PolicyItemsDefinitionType buildGenerateObject(String policyOid, String targetPath, Boolean execute)
 	{
@@ -92,9 +95,11 @@ public class RestUtil {
 		targetType.setPath(itemPathType);
 		policyItemDefinitionType.setTarget(targetType);
 
-		//Set valuePolicyRef
-		policyItemDefinitionType.setValuePolicyRef(buildValuePolicyRef(policyOid));
-
+		if(!"".equals(policyOid))
+		{
+			//Set valuePolicyRef
+			policyItemDefinitionType.setValuePolicyRef(buildValuePolicyRef(policyOid));
+		}
 		//Set Execute
 		policyItemDefinitionType.setExecute(execute);
 

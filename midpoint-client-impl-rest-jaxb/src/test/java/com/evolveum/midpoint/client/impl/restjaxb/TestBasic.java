@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBException;
 import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
+import com.evolveum.prism.xml.ns._public.types_3.ProtectedStringType;
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import com.sun.org.apache.xerces.internal.dom.TextImpl;
 import org.apache.cxf.endpoint.Server;
@@ -153,18 +154,18 @@ public class TestBasic {
 		assertEquals(util.getOrig(user.getGivenName()), "Charlie");
 	}
 
-	@Test
-	public void test900UserDelete() throws Exception{
-		// SETUP
-		Service service = getService();
-
-		// WHEN
-		try{
-			service.users().oid("123").delete();
-		}catch(ObjectNotFoundException e){
-			fail("Cannot delete user, user not found");
-		}
-	}
+//	@Test
+//	public void test900UserDelete() throws Exception{
+//		// SETUP
+//		Service service = getService();
+//
+//		// WHEN
+//		try{
+//			service.users().oid("123").delete();
+//		}catch(ObjectNotFoundException e){
+//			fail("Cannot delete user, user not found");
+//		}
+//	}
 	
 	@Test
 	public void test010UserSearch() throws Exception {
@@ -254,17 +255,12 @@ public class TestBasic {
 	{
 		Service service = getService();
 
+		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("credentials/password/value").post();
+		UserType user = userRef.get();
+		ProtectedStringType password = user.getCredentials().getPassword().getValue();
+		password.getContent().get(0).toString();
 
-		 PolicyItemsDefinitionType result = service.users().oid("123").generate().post();
-
-		List<PolicyItemDefinitionType> resultList = result.getPolicyItemDefinition();
-		PolicyItemDefinitionType policyItemDefinitionType = resultList.get(0);
-		//Why cant getValue just return the string value? :(
-		ElementNSImpl elementNSImpl = (ElementNSImpl) policyItemDefinitionType.getValue();
-		TextImpl textImpl = (TextImpl) elementNSImpl.getFirstChild();
-		String value = textImpl.getData();
-
-		System.out.println(value);
+		System.out.println(password.getContent().get(0).toString());
 	}
 /*
 	@Test
