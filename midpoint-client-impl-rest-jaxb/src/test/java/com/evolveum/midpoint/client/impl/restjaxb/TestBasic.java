@@ -35,6 +35,7 @@ import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefini
 import com.evolveum.prism.xml.ns._public.types_3.ProtectedStringType;
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import com.sun.org.apache.xerces.internal.dom.TextImpl;
+import com.sun.org.apache.xpath.internal.functions.FuncSubstring;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -255,11 +256,10 @@ public class TestBasic {
 	{
 		Service service = getService();
 
-		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("credentials/password/value").post();
+		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("description").post();
 		UserType user = userRef.get();
 		ProtectedStringType password = user.getCredentials().getPassword().getValue();
-
-		//TODO: Finish test
+		assertNotNull(password);
 	}
 
 	@Test
@@ -269,23 +269,6 @@ public class TestBasic {
 		String generatedPassword = service.valuePolicies().oid("00000000-0000-0000-0000-000000000003").generate().post();
 		assertNotNull(generatedPassword);
 	}
-/*
-	@Test
-	public void test202generateImplicit() throws Exception
-	{
-		Service service = getService();
-
-		service.users().oid("123").generate().path().post();
-	}
-
-	@Test
-	public void test203generateExecute() throws Exception
-	{
-		Service service = getService();
-
-		service.users().oid("123").generate().path().execute.post();
-	}*/
-
 	
 private Service getService() throws IOException {
 		
