@@ -62,12 +62,12 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 
 	@BeforeClass
 	public void init() throws IOException {
-		//startServer();
+		startServer();
 	}
 	
 	@Test
@@ -255,15 +255,13 @@ public class TestBasic {
 	public void test201modifyGenerate() throws Exception
 	{
 		Service service = getService();
-
-		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("description").post();
+		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("givenName").post();
 		UserType user = userRef.get();
-		ProtectedStringType password = user.getCredentials().getPassword().getValue();
-		assertNotNull(password);
+		assertNotNull(service.util().getOrig(user.getGivenName()));
 	}
 
 	@Test
-	public void test201policyGenerate() throws Exception
+	public void test202policyGenerate() throws Exception
 	{
 		Service service = getService();
 		String generatedPassword = service.valuePolicies().oid("00000000-0000-0000-0000-000000000003").generate().post();
