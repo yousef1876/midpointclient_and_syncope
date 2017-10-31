@@ -203,6 +203,20 @@ public class MidpointMockRestService {
 		
 		return RestMockServiceUtil.createResponse(Status.OK, resultList, result);
 	}
+
+	@GET
+	@Path("/self")
+	@Produces({MediaType.APPLICATION_XML})
+	public Response searchObjects(@Context MessageContext mc){
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Self");
+
+		UserType userType = new UserType();
+		RestJaxbServiceUtil util = new RestJaxbServiceUtil();
+		userType.setName(util.createPoly("administrator"));
+
+		return RestMockServiceUtil.createResponse(Status.OK, userType, result);
+	}
 	
 	private JAXBContext createJaxbContext() throws IOException {
 		try {

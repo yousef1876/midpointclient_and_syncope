@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.rmi.CORBA.Util;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -56,6 +57,8 @@ public class TestBasic {
 	private static Server server;
 	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
 	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	private static final String ADMIN = "administrator";
+	private static final String ADMIN_PASS = "5ecr3t";
 
 	@BeforeClass
 	public void init() throws IOException {
@@ -105,7 +108,6 @@ public class TestBasic {
 		} catch (ObjectNotFoundException e) {
 			// nothing to do. this is expected
 		}
-		
 	}
 
 	@Test
@@ -151,19 +153,7 @@ public class TestBasic {
 
 	}
 
-	@Test
-	public void test201UserDelete() throws Exception{
-		// SETUP
-		Service service = getService();
 
-		// WHEN
-		try{
-			service.users().oid("123").delete();
-		}catch(ObjectNotFoundException e){
-			fail("Cannot delete user, user not found");
-		}
-	}
-	
 	@Test
 	public void test010UserSearch() throws Exception {
 		Service service = getService();
@@ -187,8 +177,8 @@ public class TestBasic {
 
 	@Test
 	public void test100challengeRepsonse() throws Exception {
-		RestJaxbService service = (RestJaxbService) getService("administrator", "", AuthenticationType.SECQ);
-		
+		RestJaxbService service = (RestJaxbService) getService(ADMIN, "", AuthenticationType.SECQ);
+
 		try { 
 			service.users().oid("123").get();
 			fail("unexpected success. should fail because of authentication");
@@ -206,7 +196,7 @@ public class TestBasic {
 
 		}
 		
-		service = (RestJaxbService) getService("administrator", challenge.getAnswer());
+		service = (RestJaxbService) getService(ADMIN, challenge.getAnswer());
 		
 		try { 
 			service.users().oid("123").get();
@@ -221,35 +211,66 @@ public class TestBasic {
 	@Test
 	public void test200fullChallengeRepsonse() throws Exception {
 		RestJaxbService service = (RestJaxbService) getService(null, null, null);
-		
-		try { 
+
+		try {
 			service.users().oid("123").get();
 			fail("unexpected success. should fail because of authentication");
 		} catch (AuthenticationException ex) {
-			//this is expected.. 
+			//this is expected..
 		}
-		
+
 		List<AuthenticationType> supportedAuthentication = service.getSupportedAuthenticationsByServer();
 		assertNotNull("no supported authentication. something wen wrong", supportedAuthentication);
 		AuthenticationType basicAtuh = supportedAuthentication.iterator().next();
 		assertEquals(basicAtuh.getType(), AuthenticationType.BASIC.getType(), "expected basic authentication, but got" + basicAtuh);
-		
-		
-		service = (RestJaxbService) getService("administrator", "5ecr3t", basicAtuh);
-		
-		try { 
+
+
+		service = (RestJaxbService) getService(ADMIN, ADMIN_PASS, basicAtuh);
+
+		try {
 			service.users().oid("123").get();
-			
+
 		} catch (AuthenticationException ex) {
 			fail("should authenticate user successfully");
 		}
-		
-		
+
+
 	}
-	
-private Service getService() throws IOException {
+
+	@Test
+	public void test201self() throws Exception {
+		Service service = getService();
+
+		UserType loggedInUser = null;
+
+		try {
+			loggedInUser = service.self();
+
+		} catch (AuthenticationException ex) {
+			fail("should authenticate user successfully");
+		}
+
+		assertEquals(service.util().getOrig(loggedInUser.getName()), ADMIN);
+	}
+
+	@Test
+	public void test202UserDelete() throws Exception{
+		// SETUP
+		Service service = getService();
+
+		// WHEN
+		try{
+			service.users().oid("123").delete();
+		}catch(ObjectNotFoundException e){
+			fail("Cannot delete user, user not found");
+		}
+	}
+
+
+
+	private Service getService() throws IOException {
 		
-		return getService("administrator", "5ecr3t", AuthenticationType.BASIC);
+		return getService(ADMIN, ADMIN_PASS, AuthenticationType.BASIC);
 		
 	}
 	

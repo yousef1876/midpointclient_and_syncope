@@ -15,6 +15,7 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 
 /**
@@ -27,6 +28,7 @@ public interface Service {
 //	ProxyService proxy();
 
 	ObjectCollectionService<UserType> users();
+	UserType self() throws AuthenticationException;
 	
 	ServiceUtil util();
 }
