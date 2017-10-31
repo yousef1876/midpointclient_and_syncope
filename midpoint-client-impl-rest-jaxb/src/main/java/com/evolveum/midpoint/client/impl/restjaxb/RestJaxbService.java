@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.oracle.jrockit.jfr.UseConstantPool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -191,6 +192,26 @@ public class RestJaxbService implements Service {
 		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
 			throw new AuthenticationException("Cannot authentication user");
 		}
+	}
+
+	@Override
+	public UserType self() throws AuthenticationException{
+		String urlPrefix = "/self";
+		Response response = client.replacePath(urlPrefix).get();
+
+
+		if (Status.OK.getStatusCode() == response.getStatus() ) {
+			return response.readEntity(UserType.class);
+		}
+
+		if (Status.BAD_REQUEST.getStatusCode() == response.getStatus()) {
+			throw new BadRequestException("Bad request");
+		}
+
+		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
+			throw new AuthenticationException("Cannot authentication user");
+		}
+		return null;
 	}
 
 	private JAXBContext createJaxbContext() throws JAXBException {
