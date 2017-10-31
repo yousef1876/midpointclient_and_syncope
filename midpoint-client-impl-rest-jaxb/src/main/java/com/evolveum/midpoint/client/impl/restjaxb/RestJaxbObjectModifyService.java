@@ -41,11 +41,6 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
 
 
     @Override
-    public ObjectGenerateService<O> generate(String path) throws ObjectNotFoundException, AuthenticationException{
-        return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid(), path);
-    }
-
-    @Override
     public TaskFuture apost() throws AuthorizationException, ObjectNotFoundException, AuthenticationException
     {
         String oid = getOid();

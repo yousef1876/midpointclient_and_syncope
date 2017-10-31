@@ -14,6 +14,4 @@ public interface ObjectModifyService <O extends ObjectType> extends Post<ObjectR
 {
 
     ObjectModifyService<O> item(String path, Object value);
-
-    ObjectGenerateService<O> generate(String path) throws ObjectNotFoundException, AuthenticationException;
 }

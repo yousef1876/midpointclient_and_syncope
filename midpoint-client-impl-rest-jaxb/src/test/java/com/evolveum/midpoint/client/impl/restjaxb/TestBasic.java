@@ -255,7 +255,7 @@ public class TestBasic {
 	public void test201modifyGenerate() throws Exception
 	{
 		Service service = getService();
-		ObjectReference<UserType> userRef = service.users().oid("123").modify().generate("givenName").post();
+		ObjectReference<UserType> userRef = service.users().oid("123").modifyGenerate("givenName").post();
 		UserType user = userRef.get();
 		assertNotNull(service.util().getOrig(user.getGivenName()));
 	}
