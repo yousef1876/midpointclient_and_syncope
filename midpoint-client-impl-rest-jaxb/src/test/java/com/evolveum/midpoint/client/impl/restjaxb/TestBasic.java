@@ -151,28 +151,6 @@ public class TestBasic {
 
 	}
 
-//	@Test
-//	public void test006UserModifyDelete() throws Exception{
-//		Service service = getService();
-//		ServiceUtil util = service.util();
-//
-//
-//		ObjectReference<UserType> ref = null;
-//
-//		try{
-//			ref	= service.users().oid("123")
-//					.modify()
-//					.delete("givenName", "Charlie")
-//					.post();
-//		}catch(ObjectNotFoundException e){
-//			fail("Cannot modify user, user not found");
-//		}
-//
-//		UserType user = ref.get();
-//		assertEquals(user.getDescription(), "test description");
-//		assertEquals(util.getOrig(user.getGivenName()), "Charlie");
-//	}
-
 	@Test
 	public void test201UserDelete() throws Exception{
 		// SETUP
