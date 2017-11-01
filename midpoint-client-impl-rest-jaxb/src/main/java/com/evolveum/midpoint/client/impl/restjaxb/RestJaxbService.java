@@ -52,6 +52,8 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 public class RestJaxbService implements Service {
 	
 	private static final String URL_PREFIX_USERS = "users";
+	private static final String IMPERSONATE_HEADER = "Switch-To-Principal";
+
 	
 	private final ServiceUtil util;
 
@@ -132,6 +134,12 @@ public class RestJaxbService implements Service {
 		util = new RestJaxbServiceUtil();
 		domSerializer = new DomSerializer(jaxbContext);
 	}
+	@Override
+	public Service impersonate(String oid){
+		client.header(IMPERSONATE_HEADER, oid);
+		return this;
+	}
+
 
 	@Override
 	public ObjectCollectionService<UserType> users() {

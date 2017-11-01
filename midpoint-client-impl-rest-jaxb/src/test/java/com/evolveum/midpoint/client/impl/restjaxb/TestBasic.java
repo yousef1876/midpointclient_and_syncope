@@ -55,14 +55,14 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	//private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 	private static final String ADMIN = "administrator";
 	private static final String ADMIN_PASS = "5ecr3t";
 
 	@BeforeClass
 	public void init() throws IOException {
-		startServer();
+		//startServer();
 	}
 	
 	@Test
@@ -234,7 +234,7 @@ public class TestBasic {
 	}
 
 	@Test
-	public void test201self() throws Exception {
+	public void test012Self() throws Exception {
 		Service service = getService();
 
 		UserType loggedInUser = null;
@@ -250,7 +250,24 @@ public class TestBasic {
 	}
 
 	@Test
-	public void test202UserDelete() throws Exception{
+	public void test013SelfImpersonate() throws Exception {
+		Service service = getService();
+
+		UserType loggedInUser = null;
+
+		try {
+			loggedInUser = service.impersonate("44af349b-5a0c-4f3a-9fe9-2f64d9390ed3").self();
+
+		} catch (AuthenticationException ex) {
+			fail("should authenticate user successfully");
+		}
+
+		assertEquals(service.util().getOrig(loggedInUser.getName()), "impersonate");
+	}
+
+
+	@Test
+	public void test203UserDelete() throws Exception{
 		// SETUP
 		Service service = getService();
 
