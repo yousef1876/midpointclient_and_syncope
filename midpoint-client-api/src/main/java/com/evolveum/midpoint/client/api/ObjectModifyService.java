@@ -12,6 +12,10 @@ import java.util.Map;
  */
 public interface ObjectModifyService <O extends ObjectType> extends Post<ObjectReference<O>>
 {
-
-    ObjectModifyService<O> item(String path, Object value);
+    ObjectModifyService<O> add(String path, Object value);
+    ObjectModifyService<O> add(Map<String, Object> modifications);
+    ObjectModifyService<O> replace(String path, Object value);
+    ObjectModifyService<O> replace(Map<String, Object> modifications);
+    ObjectModifyService<O> delete(String path, Object value);
+    ObjectModifyService<O> delete(Map<String, Object> modifications);
 }

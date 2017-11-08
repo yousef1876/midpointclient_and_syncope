@@ -41,6 +41,7 @@ import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinit
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.*;
 import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
+import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import com.sun.org.apache.xerces.internal.dom.TextImpl;
@@ -230,12 +231,18 @@ public class MidpointMockRestService {
 		//Grab changes from the ObjectModificationType
 		List<ItemDeltaType> deltaTypeList = object.getItemDelta();
 
-		ItemDeltaType delta1 = deltaTypeList.get(1);
-		String description = delta1.getValue().get(0).toString();
-		objectType.setDescription(description);
+		for(ItemDeltaType delta : deltaTypeList){
+			if(delta.getModificationType() == ModificationTypeType.ADD){
+				objectType.setGivenName((PolyStringType)delta.getValue().get(0));
+			}
+			else if(delta.getModificationType() == ModificationTypeType.REPLACE){
 
-		ItemDeltaType delta2 = deltaTypeList.get(0);
-		objectType.setGivenName((PolyStringType)delta2.getValue().get(0));
+				objectType.setDescription(delta.getValue().get(0).toString());
+			}
+			else{ //ModificationTypeType.DELETE
+				objectType.setGivenName(null);
+			}
+		}
 
 		return Response.status(Status.NO_CONTENT).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
 	}
