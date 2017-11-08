@@ -140,6 +140,12 @@ public class RestJaxbService implements Service {
 		return this;
 	}
 
+	@Override
+	public Service addHeader(String header, String value){
+		client.header(header, value);
+		return this;
+	}
+
 
 	@Override
 	public ObjectCollectionService<UserType> users() {

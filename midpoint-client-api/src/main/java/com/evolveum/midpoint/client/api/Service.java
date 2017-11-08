@@ -30,6 +30,7 @@ public interface Service {
 	ObjectCollectionService<UserType> users();
 	UserType self() throws AuthenticationException;
 	Service impersonate(String oid);
+	Service addHeader(String header, String value);
 	
 	ServiceUtil util();
 }
