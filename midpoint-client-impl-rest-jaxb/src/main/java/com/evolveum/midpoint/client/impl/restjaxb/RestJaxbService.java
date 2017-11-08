@@ -146,7 +146,6 @@ public class RestJaxbService implements Service {
 		return this;
 	}
 
-
 	@Override
 	public ObjectCollectionService<UserType> users() {
 		return new RestJaxbObjectCollectionService<>(this, URL_PREFIX_USERS, UserType.class);

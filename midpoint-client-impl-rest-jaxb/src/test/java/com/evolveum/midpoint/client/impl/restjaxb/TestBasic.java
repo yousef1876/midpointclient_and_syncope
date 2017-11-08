@@ -146,13 +146,10 @@ public class TestBasic {
 		UserType user = ref.get();
 		assertEquals(user.getDescription(), "test description");
 		assertEquals(util.getOrig(user.getGivenName()), "Charlie");
-
 		ref	= service.users().oid("123").modify().delete("givenName", util.createPoly("Charlie")).post();
 
 		assertEquals(ref.get().getGivenName(), null);
-
 	}
-
 
 	@Test
 	public void test010UserSearch() throws Exception {

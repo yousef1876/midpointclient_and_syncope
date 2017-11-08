@@ -31,6 +31,5 @@ public interface Service {
 	UserType self() throws AuthenticationException;
 	Service impersonate(String oid);
 	Service addHeader(String header, String value);
-	
 	ServiceUtil util();
 }
