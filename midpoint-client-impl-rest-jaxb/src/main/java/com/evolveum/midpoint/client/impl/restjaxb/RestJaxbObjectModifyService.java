@@ -1,14 +1,19 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import com.evolveum.midpoint.client.api.ObjectModifyService;
+import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.client.api.TaskFuture;
 import com.evolveum.midpoint.client.api.exception.*;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
+import org.apache.cxf.resource.ClasspathResolver;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,25 +22,57 @@ import java.util.Map;
 public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectModifyService<O>
 {
 
-    private Map<String, Object> modifications;
+    private List<ItemDeltaType> modifications;
 
     public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid)
     {
-
-        this(service, type, oid, new HashMap<>());
-    }
-
-
-    public RestJaxbObjectModifyService(RestJaxbService service, Class<O> type, String oid, Map<String, Object> modifications)
-    {
         super(service, type, oid);
-        this.modifications = modifications;
+        modifications = new ArrayList<>();
     }
 
     @Override
-    public RestJaxbObjectModifyService<O> item(String path, Object value){
-        this.modifications.put(path, value);
+    public RestJaxbObjectModifyService<O> add(String path, Object value){
+        addModification(path, value, ModificationTypeType.ADD);
         return this;
+    }
+
+    @Override
+    public RestJaxbObjectModifyService<O> add(Map<String, Object> modifications){
+        addModifications(modifications, ModificationTypeType.ADD);
+        return this;
+    }
+
+    @Override
+    public RestJaxbObjectModifyService<O> replace(String path, Object value){
+        addModification(path, value, ModificationTypeType.REPLACE);
+        return this;
+    }
+
+    @Override
+    public RestJaxbObjectModifyService<O> replace(Map<String, Object> modifications){
+        addModifications(modifications, ModificationTypeType.REPLACE);
+        return this;
+    }
+
+    @Override
+    public RestJaxbObjectModifyService<O> delete(String path, Object value){
+        addModification(path, value, ModificationTypeType.DELETE);
+        return this;
+    }
+
+    @Override
+    public RestJaxbObjectModifyService<O> delete(Map<String, Object> modifications){
+        addModifications(modifications, ModificationTypeType.DELETE);
+        return this;
+    }
+
+    private void addModification(String path, Object value, ModificationTypeType modificationType){
+        modifications.add(RestUtil.buildItemDelta(modificationType, path, value));
+    }
+
+    private void addModifications(Map<String, Object> modifications,  ModificationTypeType modificationType){
+        modifications.forEach((path, value) ->
+        addModification(path, value, modificationType));
     }
 
     @Override
@@ -44,7 +81,7 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
         String oid = getOid();
         String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), oid);
 
-        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildModifyObject(modifications, ModificationTypeType.ADD));
+        Response response = getService().getClient().replacePath(restPath).post(RestUtil.buildModifyObject(modifications));
 
         switch (response.getStatus()) {
             case 204:

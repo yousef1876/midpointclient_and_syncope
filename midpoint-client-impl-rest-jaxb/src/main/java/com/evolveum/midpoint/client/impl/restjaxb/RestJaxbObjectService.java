@@ -46,12 +46,6 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	}
 
 	@Override
-	public ObjectModifyService<O> modify(Map<String, Object> modifications) throws ObjectNotFoundException, AuthenticationException
-	{
-		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid(), modifications);
-	}
-
-	@Override
 	public ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException
 	{
 		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid());
