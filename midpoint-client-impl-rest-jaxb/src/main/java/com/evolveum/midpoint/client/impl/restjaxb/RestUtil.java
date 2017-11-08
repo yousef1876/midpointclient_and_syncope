@@ -20,6 +20,7 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,19 +34,12 @@ public class RestUtil {
 		return "/" + urlPrefix + "/" + pathSegment;
 	}
 
-	//TODO: If these work, item to interface
-	public static ObjectModificationType buildModifyObject(String path, Object value, ModificationTypeType modificationType)
-	{
-		ObjectModificationType objectModificationType = new ObjectModificationType();
-		objectModificationType.getItemDelta().add(buildItemDelta(modificationType, path, value));
-		return objectModificationType;
-	}
 
-	public static ObjectModificationType buildModifyObject(Map<String, Object> pathValueMap, ModificationTypeType modificationType)
+	public static ObjectModificationType buildModifyObject(List<ItemDeltaType> itemDeltas)
 	{
 		ObjectModificationType objectModificationType = new ObjectModificationType();
-		pathValueMap.forEach((path, value) ->
-				objectModificationType.getItemDelta().add(buildItemDelta(modificationType, path, value)));
+		itemDeltas.forEach((itemDelta) ->
+				objectModificationType.getItemDelta().add(itemDelta));
 
 		return objectModificationType;
 	}
@@ -61,13 +55,6 @@ public class RestUtil {
 		itemPathType.setValue(path);
 		itemDeltaType.setPath(itemPathType);
 
-		//Set Value
-		//TODO: Refactor. This really sucks. Passing an Object is very open-ended here.
-		//This is done because currently when a string value is marshalled to xml it gets a type attribute
-		//on it. That type attribute can cause conflicts depending on the attribute being updated.
-		//For example, if updating GivenName, an error would be thrown as midpoint is expecting a polyStringType.
-		//This is probably a namespacing issue. The current marshalling process is not robust enough to handle it and
-		//still be generic.
 		itemDeltaType.getValue().add(value);
 
 		return itemDeltaType;
