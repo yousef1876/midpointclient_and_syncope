@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.rmi.CORBA.Util;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.client.impl.restjaxb.RestJaxbServiceUtil;
+import com.evolveum.midpoint.client.impl.restjaxb.RestUtil;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
@@ -55,6 +57,8 @@ import com.evolveum.prism.xml.ns._public.query_3.QueryType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.apache.cxf.transport.http.Headers;
+
 
 /**
  * 
@@ -68,8 +72,16 @@ public class MidpointMockRestService {
 	
 		private Map<String, ObjectType> userMap = new HashMap<>();
 		private Map<String, ObjectType> valuePolicyMap = new HashMap<>();
+
+		private RestJaxbServiceUtil util = new RestJaxbServiceUtil();
+		private static final String IMPERSONATE_OID = "44af349b-5a0c-4f3a-9fe9-2f64d9390ed3";
 		
 		public MidpointMockRestService() {
+			UserType impersonate = new UserType();
+			impersonate.setName(util.createPoly("impersonate"));
+			impersonate.setOid(IMPERSONATE_OID);
+
+			userMap.put(IMPERSONATE_OID, impersonate);
 			objectMap.put("users", userMap);
 
 			valuePolicyMap.put("00000000-0000-0000-0000-000000000003", new ValuePolicyType());
@@ -299,6 +311,27 @@ public class MidpointMockRestService {
 		}
 		
 		return RestMockServiceUtil.createResponse(Status.OK, resultList, result);
+	}
+
+	@GET
+	@Path("/self")
+	@Produces({MediaType.APPLICATION_XML})
+	public Response self(@Context MessageContext mc){
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Self");
+
+		String impersonateOid = mc.getHttpHeaders().getHeaderString("Switch-To-Principal");
+		UserType userType;
+
+		if(null != impersonateOid){
+			userType = (UserType) userMap.get(impersonateOid);
+		}else
+		{
+			userType = new UserType();
+			RestJaxbServiceUtil util = new RestJaxbServiceUtil();
+			userType.setName(util.createPoly("administrator"));
+		}
+		return RestMockServiceUtil.createResponse(Status.OK, userType, result);
 	}
 	
 	private JAXBContext createJaxbContext() throws IOException {

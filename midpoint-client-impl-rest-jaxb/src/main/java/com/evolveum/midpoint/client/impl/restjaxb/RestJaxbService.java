@@ -30,8 +30,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+
 import com.evolveum.midpoint.client.api.PolicyCollectionService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
+import com.oracle.jrockit.jfr.UseConstantPool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -53,6 +55,8 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 public class RestJaxbService implements Service {
 	
 	private static final String URL_PREFIX_USERS = "users";
+	private static final String IMPERSONATE_HEADER = "Switch-To-Principal";
+
 	
 	private final ServiceUtil util;
 
@@ -133,6 +137,17 @@ public class RestJaxbService implements Service {
 		util = new RestJaxbServiceUtil();
 		domSerializer = new DomSerializer(jaxbContext);
 	}
+	@Override
+	public Service impersonate(String oid){
+		client.header(IMPERSONATE_HEADER, oid);
+		return this;
+	}
+
+	@Override
+	public Service addHeader(String header, String value){
+		client.header(header, value);
+		return this;
+	}
 
 	@Override
 	public ObjectCollectionService<UserType> users() {
@@ -197,6 +212,26 @@ public class RestJaxbService implements Service {
 		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
 			throw new AuthenticationException("Cannot authentication user");
 		}
+	}
+
+	@Override
+	public UserType self() throws AuthenticationException{
+		String urlPrefix = "/self";
+		Response response = client.replacePath(urlPrefix).get();
+
+
+		if (Status.OK.getStatusCode() == response.getStatus() ) {
+			return response.readEntity(UserType.class);
+		}
+
+		if (Status.BAD_REQUEST.getStatusCode() == response.getStatus()) {
+			throw new BadRequestException("Bad request");
+		}
+
+		if (Status.UNAUTHORIZED.getStatusCode() == response.getStatus()) {
+			throw new AuthenticationException("Cannot authentication user");
+		}
+		return null;
 	}
 
 	private JAXBContext createJaxbContext() throws JAXBException {
