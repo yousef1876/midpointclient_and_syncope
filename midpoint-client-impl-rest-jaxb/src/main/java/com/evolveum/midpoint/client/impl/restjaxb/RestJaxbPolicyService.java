@@ -15,44 +15,31 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
-import com.evolveum.midpoint.client.api.ObjectGenerateService;
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.PolicyGenerateService;
+import com.evolveum.midpoint.client.api.PolicyService;
 import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 
 import java.util.Map;
 
 /**
- * @author semancik
+ * @author jakmor
  *
  */
-public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectWebResource<O> implements ObjectService<O> {
+public class RestJaxbPolicyService<O extends ObjectType> extends RestJaxbObjectService<O> implements PolicyService<O>
+{
 
-	public RestJaxbObjectService(final RestJaxbService service, final Class<O> type, final String oid) {
+	public RestJaxbPolicyService(final RestJaxbService service, final Class<O> type, final String oid) {
 		super(service, type, oid);
 	}
 
 	@Override
-	public O get() throws ObjectNotFoundException, AuthenticationException {
-		return getService().getObject(getType(), getOid());
-	}
-
-	@Override
-	public void delete() throws ObjectNotFoundException, AuthenticationException
+	public PolicyGenerateService generate()
 	{
-		 getService().deleteObject(getType(), getOid());
-	}
-
-	@Override
-	public ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException
-	{
-		return new RestJaxbObjectModifyService<>(getService(), getType(), getOid());
-	}
-
-	@Override
-	public ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException{
-		return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid(), path);
+		return new RestJaxbPolicyGenerateService<>(getService(),getType(), getOid());
 	}
 }

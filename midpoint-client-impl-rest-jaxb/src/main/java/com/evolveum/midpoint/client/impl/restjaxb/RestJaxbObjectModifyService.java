@@ -1,5 +1,6 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import com.evolveum.midpoint.client.api.ObjectGenerateService;
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.client.api.TaskFuture;
@@ -53,6 +54,7 @@ public class RestJaxbObjectModifyService<O extends ObjectType> extends AbstractO
         addModifications(modifications, ModificationTypeType.REPLACE);
         return this;
     }
+
 
     @Override
     public RestJaxbObjectModifyService<O> delete(String path, Object value){

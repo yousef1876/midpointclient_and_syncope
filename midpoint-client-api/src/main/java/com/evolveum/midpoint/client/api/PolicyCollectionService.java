@@ -15,20 +15,13 @@
  */
 package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.exception.AuthenticationException;
-import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
-import com.evolveum.midpoint.client.api.verb.Delete;
-import com.evolveum.midpoint.client.api.verb.Get;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
-import java.util.Map;
-
 /**
- * @author semancik
+ * @author jakmor
  *
  */
-public interface ObjectService<O extends ObjectType> extends Get<O>, Delete<O>
-{
-    ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException;
-    ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException;
+public interface PolicyCollectionService<O extends ObjectType> extends ObjectCollectionService<O> {
+	@Override
+	PolicyService<O> oid(String oid);
 }

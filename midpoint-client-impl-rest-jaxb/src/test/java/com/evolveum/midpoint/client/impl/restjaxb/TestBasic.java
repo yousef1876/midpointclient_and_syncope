@@ -25,16 +25,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import javax.ws.rs.core.Response;
 import javax.rmi.CORBA.Util;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
+import com.evolveum.prism.xml.ns._public.types_3.ProtectedStringType;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import com.sun.org.apache.xerces.internal.dom.TextImpl;
+import com.sun.org.apache.xpath.internal.functions.FuncSubstring;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.transport.local.LocalConduit;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -151,6 +160,19 @@ public class TestBasic {
 		assertEquals(ref.get().getGivenName(), null);
 	}
 
+//	@Test
+//	public void test900UserDelete() throws Exception{
+//		// SETUP
+//		Service service = getService();
+//
+//		// WHEN
+//		try{
+//			service.users().oid("123").delete();
+//		}catch(ObjectNotFoundException e){
+//			fail("Cannot delete user, user not found");
+//		}
+//	}
+	
 	@Test
 	public void test010UserSearch() throws Exception {
 		Service service = getService();
@@ -235,6 +257,22 @@ public class TestBasic {
 	}
 
 	@Test
+	public void test201modifyGenerate() throws Exception
+	{
+		Service service = getService();
+		ObjectReference<UserType> userRef = service.users().oid("123").modifyGenerate("givenName").post();
+		UserType user = userRef.get();
+		assertNotNull(service.util().getOrig(user.getGivenName()));
+	}
+
+	@Test
+	public void test202policyGenerate() throws Exception
+	{
+		Service service = getService();
+		String generatedPassword = service.valuePolicies().oid("00000000-0000-0000-0000-000000000003").generate().post();
+		assertNotNull(generatedPassword);
+	}
+	
 	public void test012Self() throws Exception {
 		Service service = getService();
 
@@ -282,8 +320,7 @@ public class TestBasic {
 
 
 
-	private Service getService() throws IOException {
-		
+	private Service getService() throws IOException {		
 		return getService(ADMIN, ADMIN_PASS, AuthenticationType.BASIC);
 		
 	}

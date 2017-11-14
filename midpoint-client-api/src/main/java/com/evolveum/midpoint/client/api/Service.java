@@ -17,6 +17,7 @@ package com.evolveum.midpoint.client.api;
 
 import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 
 /**
  * @author semancik
@@ -28,6 +29,10 @@ public interface Service {
 //	ProxyService proxy();
 
 	ObjectCollectionService<UserType> users();
+
+
+	PolicyCollectionService<ValuePolicyType> valuePolicies();
+	
 	UserType self() throws AuthenticationException;
 	Service impersonate(String oid);
 	Service addHeader(String header, String value);

@@ -29,30 +29,36 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.*;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.client.impl.restjaxb.RestJaxbServiceUtil;
 import com.evolveum.midpoint.client.impl.restjaxb.RestUtil;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.*;
 import com.evolveum.prism.xml.ns._public.types_3.ItemDeltaType;
 import com.evolveum.prism.xml.ns._public.types_3.ModificationTypeType;
 import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import com.sun.org.apache.xerces.internal.dom.TextImpl;
+import com.sun.xml.internal.messaging.saaj.soap.impl.ElementImpl;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
 import com.evolveum.midpoint.client.impl.restjaxb.SchemaConstants;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectListType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.OperationResultStatusType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.OperationResultType;
 import com.evolveum.prism.xml.ns._public.query_3.QueryType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.apache.cxf.transport.http.Headers;
+
 
 /**
  * 
@@ -65,10 +71,10 @@ public class MidpointMockRestService {
 		private  Map<String, Map<String, ObjectType>> objectMap = new HashMap<>();
 	
 		private Map<String, ObjectType> userMap = new HashMap<>();
+		private Map<String, ObjectType> valuePolicyMap = new HashMap<>();
 
 		private RestJaxbServiceUtil util = new RestJaxbServiceUtil();
 		private static final String IMPERSONATE_OID = "44af349b-5a0c-4f3a-9fe9-2f64d9390ed3";
-
 		
 		public MidpointMockRestService() {
 			UserType impersonate = new UserType();
@@ -77,6 +83,9 @@ public class MidpointMockRestService {
 
 			userMap.put(IMPERSONATE_OID, impersonate);
 			objectMap.put("users", userMap);
+
+			valuePolicyMap.put("00000000-0000-0000-0000-000000000003", new ValuePolicyType());
+			objectMap.put("valuePolicies", valuePolicyMap);
 		}
 	
 	@POST
@@ -122,9 +131,98 @@ public class MidpointMockRestService {
 	}
 
 	@POST
+	@Path("/valuePolicies/{id}/generate")
+	@Produces({MediaType.APPLICATION_XML})
+	public Response policyGenerate(@PathParam("id") String id,
+	                                                PolicyItemsDefinitionType object,
+	                                                 @QueryParam("options") List<String> options,
+	                                                 @QueryParam("include") List<String> include,
+	                                                 @QueryParam("exclude") List<String> exclude,
+	                                                 @Context MessageContext mc){
+
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Policy generate");
+
+		String policyOid = object.getPolicyItemDefinition().get(0).getValuePolicyRef().getOid();
+		ValuePolicyType policy = (ValuePolicyType)objectMap.get("valuePolicies").get(policyOid);
+
+		if (policy == null) {
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("Policy with oid " + id + " not found");
+			return RestMockServiceUtil.createResponse(Status.NOT_FOUND, result);
+		}
+
+		try
+		{
+			DocumentBuilderFactory dFact = DocumentBuilderFactory.newInstance();
+			DocumentBuilder build = dFact.newDocumentBuilder();
+			Document doc = build.newDocument();
+			Element value = doc.createElement("value");
+			Node node = doc.createTextNode("dj38dj");
+			value.appendChild(node);
+			object.getPolicyItemDefinition().get(0).setValue(value);
+
+		}
+		catch(ParserConfigurationException e){
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("Failure creating response");
+			return RestMockServiceUtil.createResponse(Status.INTERNAL_SERVER_ERROR, result);
+		}
+
+		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).entity(object).build();
+	}
+
+	@POST
+	@Path("/{type}/{id}/generate")
+	@Produces({MediaType.APPLICATION_XML})
+	public <T extends ObjectType> Response modifyGenerate(@PathParam("type") String type, @PathParam("id") String id,
+	                                                      PolicyItemsDefinitionType object,
+	                                                      @QueryParam("options") List<String> options,
+	                                                      @QueryParam("include") List<String> include,
+	                                                      @QueryParam("exclude") List<String> exclude,
+	                                                      @Context MessageContext mc){
+
+		OperationResultType result = new OperationResultType();
+		result.setOperation("Modify generate object");
+		UserType user = (UserType) objectMap.get(type).get(id);
+
+		if (user == null) {
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("User with oid " + id + " not found");
+			return RestMockServiceUtil.createResponse(Status.NOT_FOUND, result);
+		}
+
+		String newValue = "Bob";
+
+		try
+		{
+			DocumentBuilderFactory dFact = DocumentBuilderFactory.newInstance();
+			DocumentBuilder build = dFact.newDocumentBuilder();
+			Document doc = build.newDocument();
+			Element value = doc.createElement("value");
+			Node node = doc.createTextNode(newValue);
+			value.appendChild(node);
+			object.getPolicyItemDefinition().get(0).setValue(value);
+
+		}
+		catch(ParserConfigurationException e){
+			result.setStatus(OperationResultStatusType.FATAL_ERROR);
+			result.setMessage("Failure creating response");
+			return RestMockServiceUtil.createResponse(Status.INTERNAL_SERVER_ERROR, result);
+		}
+
+		RestJaxbServiceUtil util = new RestJaxbServiceUtil();
+
+		user.setGivenName(util.createPoly(newValue));
+
+		return Response.status(Status.OK).header("Content-Type", MediaType.APPLICATION_XML).entity(object).build();
+	}
+
+	@POST
 	@Path("/{type}/{id}")
 	@Produces({MediaType.APPLICATION_XML})
-	public <T extends ObjectType> Response modifyObjectPost(@PathParam("type") String type, @PathParam("id") String id, ObjectModificationType object,
+	public <T extends ObjectType> Response modifyObjectPost(@PathParam("type") String type, @PathParam("id") String id,
+	                                                        ObjectModificationType object,
 	                                                        @QueryParam("options") List<String> options,
 	                                                        @Context UriInfo uriInfo, @Context MessageContext mc) {
 
@@ -159,7 +257,6 @@ public class MidpointMockRestService {
 		}
 
 		return Response.status(Status.NO_CONTENT).header("Content-Type", MediaType.APPLICATION_XML).entity(objectType).build();
-
 	}
 
 	@DELETE

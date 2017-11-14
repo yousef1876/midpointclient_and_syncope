@@ -17,12 +17,14 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 
 import java.util.Arrays;
 
+import javax.jws.Oneway;
 import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectListType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.ObjectModificationType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 import com.evolveum.prism.xml.ns._public.query_3.QueryType;
 
 /**
@@ -36,8 +38,8 @@ public enum Types {
 	QUERY(QueryType.class, new QName(SchemaConstants.NS_QUERY, "query"), null),
 	OBJECT_LIST_TYPE(ObjectListType.class, new QName(SchemaConstants.NS_API_TYPES, "objectList"), ""),
 	POLICY_ITEMS_DEFINITION(PolicyItemsDefinitionType.class, new QName(SchemaConstants.NS_API_TYPES, "policyItemsDefinition"), ""),
-	OBJECT_MODIFICATION_TYPE(ObjectModificationType.class, new QName(SchemaConstants.NS_API_TYPES, "objectModification"), "");
-	
+	OBJECT_MODIFICATION_TYPE(ObjectModificationType.class, new QName(SchemaConstants.NS_API_TYPES, "objectModification"), ""),
+	VALUE_POLICIES(ValuePolicyType.class, new QName(SchemaConstants.NS_COMMON, "valuePolicy"), "valuePolicies");
 	
 	
 	private Class<?> clazz;
