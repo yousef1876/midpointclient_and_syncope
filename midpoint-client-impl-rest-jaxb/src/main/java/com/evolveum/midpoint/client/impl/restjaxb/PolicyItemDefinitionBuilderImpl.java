@@ -50,15 +50,6 @@ public class PolicyItemDefinitionBuilderImpl implements PolicyItemDefinitionEntr
 
 	}
 	
-	
-//	public PolicyItemDefinitionBuilderImpl(PolicyItemDefinitionType policyDef, RestJaxbService service, String restPath) {
-//		this.service = service;
-//		this.restPath = restPath;
-//		this.policyItemDefinition = policyDef;
-//		this.allItemDefinitions = allDefinitions;
-//	}
-	
-//	@Override
 	public PolicyItemDefinitionExitBuilder policy(String oid) {
 		ObjectReferenceType ref = new ObjectReferenceType();
 		ref.setOid(oid);
@@ -66,21 +57,17 @@ public class PolicyItemDefinitionBuilderImpl implements PolicyItemDefinitionEntr
 		policyItemDefinition.setValuePolicyRef(ref);
 		return this;
 	}
-//
-//	@Override
+
 	public PolicyItemDefinitionExitBuilder execute() {
 		policyItemDefinition.setExecute(Boolean.TRUE);
 		return this;
 	}
 	
-//	@Override
 	public PolicyItemDefinitionBuilder value(Object value) {
 		policyItemDefinition.setValue(value);
 		return this;
-//		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
 	}
 
-//	@Override
 	public PolicyItemDefinitionBuilder path(String itemPath) {
 		PolicyItemTargetType policyItemTargetType = new PolicyItemTargetType();
 		ItemPathType itemPathType = new ItemPathType();
@@ -88,35 +75,14 @@ public class PolicyItemDefinitionBuilderImpl implements PolicyItemDefinitionEntr
 		policyItemTargetType.setPath(itemPathType);
 		policyItemDefinition.setTarget(policyItemTargetType);
 		return this;
-//		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
 	}
 
 
-
-//	@Override
 	public ValidateGenerateRpcService build() {
 		PolicyItemsDefinitionType policyItemsDefinition = new PolicyItemsDefinitionType();
 		policyItemsDefinition.getPolicyItemDefinition().addAll(allItemDefinitions);
 		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemsDefinition);
 	}
-//
-//
-//	@Override
-//	public PolicyItemDefinitionExitBuilder policy(String oid) {
-//		ObjectReferenceType ref = new ObjectReferenceType();
-//		ref.setOid(oid);
-//		ref.setType(Types.VALUE_POLICIES.getTypeName());
-//		policyItemDefinition.setValuePolicyRef(ref);
-//		return this;
-//	}
-//
-//
-//	@Override
-//	public PolicyItemDefinitionExitBuilder execute() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
 
 	@Override
 	public PolicyItemDefinitionEntryOrExitBuilder item() {
