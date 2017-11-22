@@ -15,27 +15,17 @@
  */
 package com.evolveum.midpoint.client.api;
 
-import com.evolveum.midpoint.client.api.exception.AuthenticationException;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
-import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
+import com.evolveum.midpoint.client.api.verb.Post;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
 
 /**
- * @author semancik
+ * 
+ * @author katkav
  *
  */
-public interface Service {
+public interface ValidateGenerateRpcService extends Post<PolicyItemsDefinitionType>{
+
+	PolicyItemDefinitionBuilder item();
 	
-	// TODO
-//	ProxyService proxy();
-
-	ObjectCollectionService<UserType> users();
-
-	RpcService rpc();
-
-	PolicyCollectionService<ValuePolicyType> valuePolicies();
 	
-	UserType self() throws AuthenticationException;
-	Service impersonate(String oid);
-	Service addHeader(String header, String value);
-	ServiceUtil util();
 }

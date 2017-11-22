@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 import com.evolveum.midpoint.client.api.PolicyCollectionService;
+import com.evolveum.midpoint.client.api.RpcService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ValuePolicyType;
 import com.oracle.jrockit.jfr.UseConstantPool;
 import org.apache.commons.lang.StringUtils;
@@ -152,6 +153,10 @@ public class RestJaxbService implements Service {
 	@Override
 	public ObjectCollectionService<UserType> users() {
 		return new RestJaxbObjectCollectionService<>(this, URL_PREFIX_USERS, UserType.class);
+	}
+	
+	public RpcService rpc() {
+		return new RestJaxbRpcService(this);
 	}
 
 	@Override

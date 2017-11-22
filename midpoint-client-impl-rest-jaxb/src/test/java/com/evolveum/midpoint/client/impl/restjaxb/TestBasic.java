@@ -71,7 +71,7 @@ public class TestBasic {
 
 	@BeforeClass
 	public void init() throws IOException {
-		//startServer();
+		startServer();
 	}
 	
 	@Test
@@ -287,6 +287,42 @@ public class TestBasic {
 
 		assertEquals(service.util().getOrig(loggedInUser.getName()), ADMIN);
 	}
+	
+	@Test
+	public void test203rpcValidate() throws Exception {
+		Service service = getService();
+		service.rpc().validate().item().policy("123123").value("asdasd").post();
+	}
+	
+	@Test
+	public void test204rpcValidate() throws Exception {
+		Service service = getService();
+		service.rpc().validate().item().value("asdasd").post();
+	}
+	
+	@Test
+	public void test205rpcValidate() throws Exception {
+		Service service = getService();
+		service.rpc().validate().item().value("asdasd").item().value("asdasdasd").item().policy("123123").value("dfgsdf").post();
+	}
+	
+	@Test
+	public void test210rpcGenerate() throws Exception {
+		Service service = getService();
+		service.rpc().generate().item().policy("123123").path("name").post();
+	}
+	
+	@Test
+	public void test211rpcGenerate() throws Exception {
+		Service service = getService();
+		service.rpc().generate().item().path("name").post();
+	}
+	
+	@Test
+	public void test212rpcGenerate() throws Exception {
+		Service service = getService();
+		service.rpc().generate().item().path("name").item().path("fullName").item().policy("123123").path("credentials/password/value").post();
+	}
 
 	@Test
 	public void test013SelfImpersonate() throws Exception {
@@ -317,6 +353,7 @@ public class TestBasic {
 			fail("Cannot delete user, user not found");
 		}
 	}
+	
 
 
 
