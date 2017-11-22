@@ -9,4 +9,6 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
  * @author jakmor
  */
 public interface ObjectGenerateService<O extends ObjectType> extends Post<ObjectReference<O>>{
+
+	PolicyItemDefinitionBuilder item();	
 }

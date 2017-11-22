@@ -48,11 +48,15 @@ public class OperationResultUtil {
 	}
 	
 	public static boolean isUnknown(OperationResultType result) {
-		return OperationResultStatusType.UNKNOWN == result.getStatus();
+		return result.getStatus() == null || OperationResultStatusType.UNKNOWN == result.getStatus();
 	}
 	
 	public static boolean isWarning(OperationResultType result) {
 		return OperationResultStatusType.WARNING == result.getStatus();
+	}
+	
+	public static boolean isAcceptable(OperationResultType result) {
+		return (result.getStatus() != OperationResultStatusType.FATAL_ERROR);
 	}
 	
 	public static void computeStatusIfUnknown(OperationResultType result) {
@@ -65,8 +69,9 @@ public class OperationResultUtil {
 	public static void computeStatus(OperationResultType result) {
 		OperationResultStatusType status = result.getStatus();
 		if (result.getPartialResults().isEmpty()) {
-			if (status == OperationResultStatusType.UNKNOWN) {
+			if (status == null || status == OperationResultStatusType.UNKNOWN) {
 				status = OperationResultStatusType.SUCCESS;
+				result.setStatus(status);
 			}
 			return;
 		}
@@ -135,6 +140,7 @@ public class OperationResultUtil {
 				message = message + ": " + newMessage;
 			}
 		}
+		result.setStatus(status);
 	}
 
 }

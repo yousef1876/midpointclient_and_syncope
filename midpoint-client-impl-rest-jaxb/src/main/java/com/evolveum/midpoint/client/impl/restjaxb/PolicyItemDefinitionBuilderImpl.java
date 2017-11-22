@@ -15,10 +15,17 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.evolveum.midpoint.client.api.PolicyItemDefinitionBuilder;
+import com.evolveum.midpoint.client.api.PolicyItemDefinitionEntryBuilder;
+import com.evolveum.midpoint.client.api.PolicyItemDefinitionEntryOrExitBuilder;
+import com.evolveum.midpoint.client.api.PolicyItemDefinitionExitBuilder;
 import com.evolveum.midpoint.client.api.ValidateGenerateRpcService;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemTargetType;
+import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefinitionType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
@@ -27,49 +34,99 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
  * @author katkav
  *
  */
-public class PolicyItemDefinitionBuilderImpl implements PolicyItemDefinitionBuilder {
+public class PolicyItemDefinitionBuilderImpl implements PolicyItemDefinitionEntryOrExitBuilder, PolicyItemDefinitionBuilder, PolicyItemDefinitionEntryBuilder, PolicyItemDefinitionExitBuilder {
 	
 	private PolicyItemDefinitionType policyItemDefinition;
 	private RestJaxbService service;
 	private String restPath;
+	
+	private List<PolicyItemDefinitionType> allItemDefinitions;
+	
 
 	public PolicyItemDefinitionBuilderImpl(RestJaxbService service, String restPath) {
 		this.service  = service;
 		this.restPath = restPath;
-		this.policyItemDefinition = new PolicyItemDefinitionType();
+		this.allItemDefinitions = new ArrayList<>();
+
 	}
 	
-	@Override
-	public PolicyItemDefinitionBuilder policy(String oid) {
+	
+//	public PolicyItemDefinitionBuilderImpl(PolicyItemDefinitionType policyDef, RestJaxbService service, String restPath) {
+//		this.service = service;
+//		this.restPath = restPath;
+//		this.policyItemDefinition = policyDef;
+//		this.allItemDefinitions = allDefinitions;
+//	}
+	
+//	@Override
+	public PolicyItemDefinitionExitBuilder policy(String oid) {
 		ObjectReferenceType ref = new ObjectReferenceType();
 		ref.setOid(oid);
 		ref.setType(Types.VALUE_POLICIES.getTypeName());
 		policyItemDefinition.setValuePolicyRef(ref);
 		return this;
 	}
-
-	@Override
-	public PolicyItemDefinitionBuilder execute() {
+//
+//	@Override
+	public PolicyItemDefinitionExitBuilder execute() {
 		policyItemDefinition.setExecute(Boolean.TRUE);
 		return this;
 	}
 	
-	@Override
-	public ValidateGenerateRpcService value(Object value) {
+//	@Override
+	public PolicyItemDefinitionBuilder value(Object value) {
 		policyItemDefinition.setValue(value);
-		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
+		return this;
+//		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
 	}
 
-	@Override
-	public ValidateGenerateRpcService path(String itemPath) {
+//	@Override
+	public PolicyItemDefinitionBuilder path(String itemPath) {
 		PolicyItemTargetType policyItemTargetType = new PolicyItemTargetType();
 		ItemPathType itemPathType = new ItemPathType();
 		itemPathType.setValue(itemPath);
 		policyItemTargetType.setPath(itemPathType);
 		policyItemDefinition.setTarget(policyItemTargetType);
-		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
+		return this;
+//		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemDefinition);
 	}
 
+
+
+//	@Override
+	public ValidateGenerateRpcService build() {
+		PolicyItemsDefinitionType policyItemsDefinition = new PolicyItemsDefinitionType();
+		policyItemsDefinition.getPolicyItemDefinition().addAll(allItemDefinitions);
+		return new RestJaxbValidateGenerateRpcService(service, restPath, policyItemsDefinition);
+	}
+//
+//
+//	@Override
+//	public PolicyItemDefinitionExitBuilder policy(String oid) {
+//		ObjectReferenceType ref = new ObjectReferenceType();
+//		ref.setOid(oid);
+//		ref.setType(Types.VALUE_POLICIES.getTypeName());
+//		policyItemDefinition.setValuePolicyRef(ref);
+//		return this;
+//	}
+//
+//
+//	@Override
+//	public PolicyItemDefinitionExitBuilder execute() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+
+	@Override
+	public PolicyItemDefinitionEntryOrExitBuilder item() {
+		policyItemDefinition = new PolicyItemDefinitionType();
+		allItemDefinitions.add(policyItemDefinition);
+		return this;
+	}
+
+	
+	
 	
 	
 }

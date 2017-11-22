@@ -37,9 +37,9 @@ public class RestJaxbPolicyService<O extends ObjectType> extends RestJaxbObjectS
 		super(service, type, oid);
 	}
 
-	@Override
-	public PolicyGenerateService generate()
-	{
-		return new RestJaxbPolicyGenerateService<>(getService(),getType(), getOid());
-	}
+//	@Override
+//	public PolicyGenerateService generate()
+//	{
+//		return new RestJaxbPolicyGenerateService<>(getService(),getType(), getOid());
+//	}
 }

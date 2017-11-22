@@ -25,7 +25,7 @@ import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefini
  */
 public interface ValidateGenerateRpcService extends Post<PolicyItemsDefinitionType>{
 
-	PolicyItemDefinitionBuilder item();
+	PolicyItemDefinitionBuilder items();
 	
 	
 }

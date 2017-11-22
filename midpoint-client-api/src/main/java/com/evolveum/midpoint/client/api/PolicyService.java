@@ -32,5 +32,5 @@ import java.util.Map;
  */
 public interface PolicyService<O extends ObjectType> extends ObjectService<O>
 {
-    PolicyGenerateService generate();
+//    PolicyGenerateService generate();
 }

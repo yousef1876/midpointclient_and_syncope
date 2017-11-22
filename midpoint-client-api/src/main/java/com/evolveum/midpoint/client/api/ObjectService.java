@@ -23,6 +23,8 @@ import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
+
 /**
  * @author semancik
  *
@@ -30,5 +32,7 @@ import java.util.Map;
 public interface ObjectService<O extends ObjectType> extends Get<O>, Delete<O>
 {
     ObjectModifyService<O> modify() throws ObjectNotFoundException, AuthenticationException;
-    ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException;
+    
+    ValidateGenerateRpcService generate();
+//    ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException;
 }

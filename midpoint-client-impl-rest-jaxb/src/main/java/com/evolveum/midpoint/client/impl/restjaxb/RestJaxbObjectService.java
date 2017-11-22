@@ -18,6 +18,7 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 import com.evolveum.midpoint.client.api.ObjectGenerateService;
 import com.evolveum.midpoint.client.api.ObjectModifyService;
 import com.evolveum.midpoint.client.api.ObjectService;
+import com.evolveum.midpoint.client.api.ValidateGenerateRpcService;
 import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
@@ -52,7 +53,13 @@ public class RestJaxbObjectService<O extends ObjectType> extends AbstractObjectW
 	}
 
 	@Override
-	public ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException{
-		return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid(), path);
+	public ValidateGenerateRpcService generate() {
+		String restPath = RestUtil.subUrl(Types.findType(getType()).getRestPath(), getOid());
+        restPath += "/generate";
+		return new RestJaxbValidateGenerateRpcService(getService(), restPath);
 	}
+//	@Override
+//	public ObjectGenerateService<O> modifyGenerate(String path) throws ObjectNotFoundException, AuthenticationException{
+//		return new RestJaxbObjectGenerateService<>(getService(), getType(), getOid(), path);
+//	}
 }

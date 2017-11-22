@@ -54,6 +54,7 @@ import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.impl.restjaxb.service.AuthenticationProvider;
 import com.evolveum.midpoint.client.impl.restjaxb.service.MidpointMockRestService;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.OperationResultStatusType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
@@ -64,8 +65,8 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	//private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
-	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+//	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 	private static final String ADMIN = "administrator";
 	private static final String ADMIN_PASS = "5ecr3t";
 
@@ -260,8 +261,18 @@ public class TestBasic {
 	public void test201modifyGenerate() throws Exception
 	{
 		Service service = getService();
-		ObjectReference<UserType> userRef = service.users().oid("123").modifyGenerate("givenName").post();
-		UserType user = userRef.get();
+		PolicyItemsDefinitionType policyItemsDefinition = service.users().oid("876").generate()
+				.items()
+					.item()
+						.path("givenName")
+					.build()
+				.post();
+		
+		assertEquals(1, policyItemsDefinition.getPolicyItemDefinition().size());
+		PolicyItemDefinitionType policyitemDefinition = policyItemsDefinition.getPolicyItemDefinition().iterator().next();
+		assertNotNull(policyitemDefinition.getValue());
+		
+		UserType user = service.users().oid("876").get();
 		assertNotNull(service.util().getOrig(user.getGivenName()));
 	}
 
@@ -269,8 +280,16 @@ public class TestBasic {
 	public void test202policyGenerate() throws Exception
 	{
 		Service service = getService();
-		String generatedPassword = service.valuePolicies().oid("00000000-0000-0000-0000-000000000003").generate().post();
-		assertNotNull(generatedPassword);
+		PolicyItemsDefinitionType policyItemsDefinition = service.rpc().generate()
+				.items()
+					.item()
+						.policy("00000000-0000-0000-0000-000000000003")
+					.build()
+				.post();
+		assertEquals(1, policyItemsDefinition.getPolicyItemDefinition().size());
+		PolicyItemDefinitionType policyitemDefinition = policyItemsDefinition.getPolicyItemDefinition().iterator().next();
+		assertNotNull(policyitemDefinition.getValue());
+		
 	}
 	
 	public void test012Self() throws Exception {
@@ -291,37 +310,81 @@ public class TestBasic {
 	@Test
 	public void test203rpcValidate() throws Exception {
 		Service service = getService();
-		service.rpc().validate().item().policy("123123").value("asdasd").post();
+		PolicyItemsDefinitionType defs = service.rpc().validate()
+				.items()
+					.item()
+						.policy("00000000-0000-0000-0000-p00000000001")
+						.value("asdasd")
+					.build()
+				.post();
+		
+		boolean allMatch = defs.getPolicyItemDefinition().stream().allMatch(def -> def.getResult().getStatus() == OperationResultStatusType.SUCCESS);
+		assertEquals(allMatch, true);
 	}
 	
 	@Test
 	public void test204rpcValidate() throws Exception {
 		Service service = getService();
-		service.rpc().validate().item().value("asdasd").post();
+		service.rpc().validate().items()
+					.item()
+						.value("asdasd")
+					.build()
+				.post();
 	}
 	
 	@Test
 	public void test205rpcValidate() throws Exception {
 		Service service = getService();
-		service.rpc().validate().item().value("asdasd").item().value("asdasdasd").item().policy("123123").value("dfgsdf").post();
+		service.rpc().validate()
+			.items()
+				.item()
+					.value("asdasd123@#")
+				.item()
+					.value("asdasdasd345345!!!")
+				.item()
+					.policy("00000000-0000-0000-0000-p00000000001")
+					.value("dfgsdf")
+				.build()
+			.post();
 	}
 	
 	@Test
 	public void test210rpcGenerate() throws Exception {
 		Service service = getService();
-		service.rpc().generate().item().policy("123123").path("name").post();
+		service.rpc().generate()
+			.items()
+				.item()
+					.policy("00000000-0000-0000-0000-p00000000001")
+						.path("name")
+					.build()
+				.post();
 	}
 	
 	@Test
 	public void test211rpcGenerate() throws Exception {
 		Service service = getService();
-		service.rpc().generate().item().path("name").post();
+		service.rpc().generate()
+			.items()
+				.item()
+					.path("name")
+				.build()
+			.post();
 	}
 	
 	@Test
 	public void test212rpcGenerate() throws Exception {
 		Service service = getService();
-		service.rpc().generate().item().path("name").item().path("fullName").item().policy("123123").path("credentials/password/value").post();
+		service.rpc().generate()
+			.items()
+				.item()
+					.path("name")
+				.item()
+					.path("fullName")
+				.item()
+					.policy("00000000-0000-0000-0000-p00000000001")
+					.path("credentials/password/value")
+				.build()
+			.post();
 	}
 
 	@Test

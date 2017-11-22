@@ -20,10 +20,9 @@ package com.evolveum.midpoint.client.api;
  * @author katkav
  *
  */
-public interface PolicyItemDefinitionBuilder {
+public interface PolicyItemDefinitionBuilder extends PolicyItemDefinitionEntryBuilder {
 
-	PolicyItemDefinitionBuilder policy(String oid);
-	PolicyItemDefinitionBuilder execute();
-	ValidateGenerateRpcService value(Object value);
-	ValidateGenerateRpcService path(String ItemPath);
+	PolicyItemDefinitionEntryOrExitBuilder item();
+	
+	
 }

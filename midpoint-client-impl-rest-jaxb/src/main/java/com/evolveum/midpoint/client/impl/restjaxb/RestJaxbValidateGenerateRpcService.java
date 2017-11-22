@@ -39,7 +39,7 @@ import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemsDefini
 public class RestJaxbValidateGenerateRpcService implements ValidateGenerateRpcService {
 
 	private RestJaxbService service;
-	private List<PolicyItemDefinitionType> policyItemDefinitions;
+	private PolicyItemsDefinitionType policyItemDefinition;
 	
 	private String path;
 	
@@ -49,27 +49,21 @@ public class RestJaxbValidateGenerateRpcService implements ValidateGenerateRpcSe
 		this.path = path;
 	}
 	
-	public RestJaxbValidateGenerateRpcService(RestJaxbService service, String path, PolicyItemDefinitionType policyItemDefinition) {
+	public RestJaxbValidateGenerateRpcService(RestJaxbService service, String path, PolicyItemsDefinitionType policyItemDefinition) {
 		this.service = service;
 		this.path = path;
-		if (policyItemDefinitions == null) {
-			policyItemDefinitions = new ArrayList<>();
-		}
-		
-		policyItemDefinitions.add(policyItemDefinition);
-		 
+		this.policyItemDefinition = policyItemDefinition; 
 	}
 	
 	@Override
 	public TaskFuture<PolicyItemsDefinitionType> apost() throws CommonException {
-		PolicyItemsDefinitionType policyItemsDefinition = new PolicyItemsDefinitionType();
-		policyItemsDefinition.getPolicyItemDefinition().addAll(policyItemDefinitions);
-
-		Response response = service.getClient().replacePath(path).post(policyItemsDefinition);
+		
+		Response response = service.getClient().replacePath(path).post(policyItemDefinition);
 		
 		switch (response.getStatus()) {
         case 200:
             PolicyItemsDefinitionType itemsDefinitionType = response.readEntity(PolicyItemsDefinitionType.class);
+            
             return new RestJaxbCompletedFuture<PolicyItemsDefinitionType>(itemsDefinitionType);
         case 400:
             throw new BadRequestException(response.getStatusInfo().getReasonPhrase());
@@ -86,7 +80,7 @@ public class RestJaxbValidateGenerateRpcService implements ValidateGenerateRpcSe
 	}
 
 	@Override
-	public PolicyItemDefinitionBuilder item() {
+	public PolicyItemDefinitionBuilder items() {
 		return new PolicyItemDefinitionBuilderImpl(service, path);
 	}
 }

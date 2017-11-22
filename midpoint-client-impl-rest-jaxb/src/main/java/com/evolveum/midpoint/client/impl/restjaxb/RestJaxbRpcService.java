@@ -27,8 +27,8 @@ import com.evolveum.midpoint.client.api.exception.CommonException;
  */
 public class RestJaxbRpcService<T> implements RpcService<T>{
 
-	private static final String GENERATE_PATH = "rpc/generate";
-	private static final String VALIDATE_PATH = "rpc/validate";
+	private static final String GENERATE_PATH = "/rpc/generate";
+	private static final String VALIDATE_PATH = "/rpc/validate";
 	
 	private RestJaxbService service;
 	
