@@ -18,6 +18,7 @@ package com.evolveum.midpoint.client.impl.restjaxb;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -50,7 +51,11 @@ public class DomSerializer {
 	private static final String FILTER_REF = "ref";
 	private static final String FILTER_REF_OID = "oid";
 	private static final String FILTER_REF_TYPE = "type";
+	private static final String FILTER_REF_RELATION = "relation";
 	
+	private static final String FILTER_SUBSTRING = "substring";
+	private static final String FILTER_SUBSTRING_ANCHOR_START = "anchorStart";
+	private static final String FILTER_SUBSTRING_ANCHOR_END = "anchorEnd";
 	private static final String FILTER_GREATER = "greater";
 	private static final String FILTER_LESS = "less";
 	
@@ -92,7 +97,6 @@ public class DomSerializer {
 	}
 	
 	public Element createEqualPolyFilter(ItemPathType itemPath, String orig, String norm) {
-		Document document = documentBuilder.newDocument();
 		Element equal = createEqual(itemPath, document);
 		
 		Element value = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_VALUE);
@@ -141,7 +145,7 @@ public class DomSerializer {
 		
 	}
 	
-	public Element createRefFilter(ItemPathType itemPath, List<ObjectReferenceType> values) {
+	public Element createRefFilter(ItemPathType itemPath, Collection<ObjectReferenceType> values) {
 		Document document = documentBuilder.newDocument();
 		Element ref = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_REF);
 		Element path = document.createElement(FILTER_PATH);
@@ -161,34 +165,66 @@ public class DomSerializer {
 					refType.setTextContent(v.getType().getLocalPart());
 					value.appendChild(refType);
 				}
-				//TODO relation...
+				if (v.getRelation() != null) {
+					Element refRelation = document.createElement(FILTER_REF_RELATION);
+					//TODO: namespaces??
+					refRelation.setTextContent(v.getRelation().getLocalPart());
+					value.appendChild(refRelation);
+				}
+
 			});
 		}
 		ref.appendChild(value);
 		return ref;
 	}
 	
-	public Element createGreaterFilter(ItemPathType itemPath, Object realValue) {
-		Document document = documentBuilder.newDocument();
-		Element greater = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_GREATER);
-		Element path = document.createElement(FILTER_PATH);
-		path.setTextContent(itemPath.getValue());
-		greater.appendChild(path);
-		
-		Element value = document.createElement(FILTER_VALUE);
-		Marshaller marshaller;
-		try {
-			marshaller = jaxbContext.createMarshaller();
-			marshaller.marshal(new JAXBElement(new QName(SchemaConstants.NS_QUERY, "value"), realValue.getClass(), realValue),
-					value);
-			
-		} catch (JAXBException e) {
-			//throw new SchemaException(e);
+	public Element createSubstringFilter(ItemPathType itemPath, Object valueToSearch, boolean anchorStart, boolean anchorEnd) {
+		Element substringFilter = createPropertyValueFilter(FILTER_SUBSTRING, itemPath, valueToSearch);
+		if (anchorStart) {
+			Element startsWith = document.createElement(FILTER_SUBSTRING_ANCHOR_START);
+			startsWith.setTextContent(String.valueOf(true));
+			substringFilter.appendChild(startsWith);
 		}
 		
-		greater.appendChild(value);
-		return greater;
+		if (anchorEnd) {
+			Element endsWith = document.createElement(FILTER_SUBSTRING_ANCHOR_END);
+			endsWith.setTextContent(String.valueOf(true));
+			substringFilter.appendChild(endsWith);
+		}
+		return substringFilter;
 	}
+	
+	public Element createGreaterFilter(ItemPathType itemPath, Object valueToSearch) {
+		return createPropertyValueFilter(FILTER_GREATER, itemPath, valueToSearch);
+	}
+	
+	public Element createLessFilter(ItemPathType itemPath, Object valueToSearch) {
+		return createPropertyValueFilter(FILTER_LESS, itemPath, valueToSearch);
+	}
+	
+private Element createPropertyValueFilter(String filterType, ItemPathType itemPath, Object valueToSearch){
+	Document document = documentBuilder.newDocument();
+	Element greater = document.createElementNS(SchemaConstants.NS_QUERY, filterType);
+	Element path = document.createElement(FILTER_PATH);
+	path.setTextContent(itemPath.getValue());
+	greater.appendChild(path);
+	
+	Element value = document.createElement(FILTER_VALUE);
+	Marshaller marshaller;
+	try {
+		marshaller = jaxbContext.createMarshaller();
+		marshaller.marshal(new JAXBElement(new QName(SchemaConstants.NS_QUERY, "value"), valueToSearch.getClass(), valueToSearch),
+				value);
+		
+	} catch (JAXBException e) {
+		//throw new SchemaException(e);
+		// TODO: how to properly handle??
+		throw new IllegalStateException(e);
+	}
+	
+	greater.appendChild(value);
+	return greater;
+}
 	
 	public Element createNotFilter(Element filter) {
 		Document document = documentBuilder.newDocument();

@@ -15,8 +15,10 @@
  */
 package com.evolveum.midpoint.client.impl.restjaxb;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -30,7 +32,6 @@ import com.evolveum.midpoint.client.api.SearchService;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectType;
 import com.evolveum.prism.xml.ns._public.query_3.QueryType;
-import com.evolveum.prism.xml.ns._public.query_3.SearchFilterType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 
 /**
@@ -41,7 +42,7 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<O>, ConditionEntryBuilder<O>, MatchingRuleEntryBuilder<O> {
 
 	private ItemPathType itemPath;
-	private RestJaxbQueryBuilder originalFilter;
+	private RestJaxbQueryBuilder<O> originalFilter;
 	private Element filterClause;
 
 	private RestJaxbService queryForService;
@@ -49,7 +50,7 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 	
 	private QueryType query;
 
-	FilterBuilder owner;
+	private FilterBuilder<O> owner;
 	
 	private RestJaxbQueryBuilder(RestJaxbQueryBuilder<O> originalFilter, ItemPathType itemPath, FilterBuilder<O> owner) {
 		this(originalFilter.queryForService, originalFilter.type);
@@ -93,11 +94,6 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 		return new RestJaxbSearchService<O>(queryForService, type, query);
 	}
 
-//	public SearchFilterType buildFilter() {
-//		SearchFilterType filter = new SearchFilterType();
-//		filter.setFilterClause(filterClause);
-//		return filter;
-//	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> eq(Object... values) {
@@ -135,19 +131,19 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public MatchingRuleEntryBuilder<O> gt(Object value) {
-		Element equal = queryForService.getDomSerializer().createGreaterFilter(itemPath, value);
-		return new RestJaxbQueryBuilder<O>(this, equal, owner);
+		Element greater = queryForService.getDomSerializer().createGreaterFilter(itemPath, value);
+		return new RestJaxbQueryBuilder<O>(this, greater, owner);
 	}
 
 	@Override
 	public QueryBuilder<O> gt() {
-		// TODO Auto-generated method stub
-		return null;
+		Element greater = queryForService.getDomSerializer().createGreaterFilter(itemPath, null);
+		return new RestJaxbQueryBuilder<O>(this, greater, owner);
 	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> ge(Object value) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stubo
 		return null;
 	}
 
@@ -159,14 +155,14 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public MatchingRuleEntryBuilder<O> lt(Object value) {
-		// TODO Auto-generated method stub
-		return null;
+		Element less = queryForService.getDomSerializer().createLessFilter(itemPath, value);
+		return new RestJaxbQueryBuilder<O>(this, less, owner);
 	}
 
 	@Override
 	public QueryBuilder<O> lt() {
-		// TODO Auto-generated method stub
-		return null;
+		Element less = queryForService.getDomSerializer().createLessFilter(itemPath, null);
+		return new RestJaxbQueryBuilder<O>(this, less, owner);
 	}
 
 	@Override
@@ -183,8 +179,8 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public MatchingRuleEntryBuilder<O> startsWith(Object value) {
-		// TODO Auto-generated method stub
-		return null;
+		Element substring = queryForService.getDomSerializer().createSubstringFilter(itemPath, value, true, false);
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
@@ -201,8 +197,8 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public MatchingRuleEntryBuilder<O> endsWith(Object value) {
-		// TODO Auto-generated method stub
-		return null;
+		Element substring = queryForService.getDomSerializer().createSubstringFilter(itemPath, value, true, false);
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
@@ -219,8 +215,8 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public MatchingRuleEntryBuilder<O> contains(Object value) {
-		// TODO Auto-generated method stub
-		return null;
+		Element substring = queryForService.getDomSerializer().createSubstringFilter(itemPath, value, false, false);
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
@@ -237,32 +233,43 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public QueryBuilder<O> ref(QName relation) {
-		// TODO Auto-generated method stub
-		return null;
+		ObjectReferenceType refType = new ObjectReferenceType();
+		refType.setRelation(relation);
+		Element substring = queryForService.getDomSerializer().createRefFilter(itemPath, Arrays.asList(refType));
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
 	public QueryBuilder<O> ref(ObjectReferenceType... value) {
-		// TODO Auto-generated method stub
-		return null;
+		Element substring = queryForService.getDomSerializer().createRefFilter(itemPath, Arrays.asList(value));
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
 	public QueryBuilder<O> ref(Collection<ObjectReferenceType> values) {
-		// TODO Auto-generated method stub
-		return null;
+		Element substring = queryForService.getDomSerializer().createRefFilter(itemPath, values);
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
-	public QueryBuilder<O> ref(String... oid) {
-		// TODO Auto-generated method stub
-		return null;
+	public QueryBuilder<O> ref(String... oids) {
+		List<ObjectReferenceType> refTypes = new ArrayList<>();
+		for (String oid : oids) {
+			ObjectReferenceType refType = new ObjectReferenceType();
+			refType.setOid(oid);
+			refTypes.add(refType);
+		}
+		Element substring = queryForService.getDomSerializer().createRefFilter(itemPath, refTypes);
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
 	public QueryBuilder<O> ref(String oid, QName targetTypeName) {
-		// TODO Auto-generated method stub
-		return null;
+		ObjectReferenceType refType = new ObjectReferenceType();
+		refType.setOid(oid);
+		refType.setType(targetTypeName);
+		Element substring = queryForService.getDomSerializer().createRefFilter(itemPath, Arrays.asList(refType));
+		return new RestJaxbQueryBuilder<O>(this, substring, owner);
 	}
 
 	@Override
