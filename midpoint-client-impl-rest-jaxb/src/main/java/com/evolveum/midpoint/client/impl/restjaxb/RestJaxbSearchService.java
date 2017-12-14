@@ -63,7 +63,7 @@ public class RestJaxbSearchService<O extends ObjectType> extends AbstractObjectT
 		
 	@Override
 	public QueryBuilder<O> queryFor(Class<O> type) {
-		return new RestJaxbQueryBuilder<O>(getService(), getType());
+		return new FilterBuilder<O>(getService(), getType());
 	}
 
 	

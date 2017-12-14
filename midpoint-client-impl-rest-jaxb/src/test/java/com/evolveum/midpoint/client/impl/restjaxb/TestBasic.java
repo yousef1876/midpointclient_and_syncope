@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.rmi.CORBA.Util;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
 import com.evolveum.midpoint.xml.ns._public.common.api_types_3.PolicyItemDefinitionType;
@@ -189,7 +190,22 @@ public class TestBasic {
 //		ActivationType activation = new ActivationType();
 //		activation.setAdministrativeStatus(ActivationStatusType.ARCHIVED);
 //		cal.setActivation(activation);
-		SearchResult<UserType> result = service.users().search().queryFor(UserType.class).item(itemPath).eq("jack").finishQuery().get();
+		SearchResult<UserType> result = service.users().search().queryFor(UserType.class)
+				.item(itemPath)
+					.eq("jack")
+				
+			.and()
+				.item(new QName("givenName"))
+					.eq("12")
+				
+			.or()
+				.item(new QName("familyName"))
+					.eq("123")
+			.and()
+				.item(new QName("familyName"))
+					.eq("345")
+				.finishQuery()
+				.get();
 		
 		// THEN
 		assertEquals(result.size(), 0);

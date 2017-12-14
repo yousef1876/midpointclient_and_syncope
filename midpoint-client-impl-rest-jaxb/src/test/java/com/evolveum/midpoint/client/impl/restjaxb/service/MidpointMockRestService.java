@@ -46,11 +46,15 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.text.StrBuilder;
+import org.apache.cxf.databinding.source.XMLStreamDataWriter;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -482,8 +486,8 @@ List<PolicyItemDefinitionType> policyItemDefinitionTypes = object.getPolicyItemD
 		
 		Marshaller marshaller = jaxbCtx.createMarshaller();
 		StringWriter writer = new StringWriter();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.marshal(new JAXBElement<QueryType>(new QName(SchemaConstants.NS_QUERY, "query"), QueryType.class, queryType), writer);
-		
 		System.out.println("Query received on the service: " + writer);
 		} catch (IOException | JAXBException e) {
 			// TODO Auto-generated catch block

@@ -49,25 +49,43 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 	
 	private QueryType query;
 
-	RestJaxbQueryBuilder(RestJaxbQueryBuilder<O> originalFilter, ItemPathType itemPath) {
+	FilterBuilder owner;
+	
+	private RestJaxbQueryBuilder(RestJaxbQueryBuilder<O> originalFilter, ItemPathType itemPath, FilterBuilder<O> owner) {
 		this(originalFilter.queryForService, originalFilter.type);
 		this.itemPath = itemPath;
+		this.owner = owner;
 	}
 
-	RestJaxbQueryBuilder(RestJaxbQueryBuilder<O> originalFilter, Element filterClause) {
+	private RestJaxbQueryBuilder(RestJaxbQueryBuilder<O> originalFilter, Element filterClause, FilterBuilder<O> owner) {
 		this(originalFilter.queryForService, originalFilter.type);
 		this.originalFilter = originalFilter;
 		this.filterClause = filterClause;
+		this.owner = owner;
 	}
 	
-	RestJaxbQueryBuilder(RestJaxbService searchService, Class<O> type, QueryType query) {
+	public RestJaxbQueryBuilder(RestJaxbService searchService, Class<O> type, QueryType query) {
 		this(searchService, type);
 		this.query = query;
+//		this.owner = owner;
 	}
 
-	public RestJaxbQueryBuilder(RestJaxbService searchService, Class<O> type) {
+	private RestJaxbQueryBuilder(RestJaxbService searchService, Class<O> type) {
 		this.queryForService = searchService;
 		this.type = type;
+		
+	}
+	
+	private RestJaxbQueryBuilder(RestJaxbService searchService, Class<O> type, FilterBuilder<O> owner) {
+		this.queryForService = searchService;
+		this.type = type;
+		this.owner = owner;
+	}
+	
+	
+	public static <O extends ObjectType>  RestJaxbQueryBuilder<O> create(RestJaxbService serachService, Class<O> type, FilterBuilder<O> owner){
+		RestJaxbQueryBuilder<O> restJaxbBuilder = new RestJaxbQueryBuilder<>(serachService, type, owner);
+		return restJaxbBuilder;
 	}
 
 	@Override
@@ -75,49 +93,50 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 		return new RestJaxbSearchService<O>(queryForService, type, query);
 	}
 
-	public SearchFilterType buildFilter() {
-		SearchFilterType filter = new SearchFilterType();
-		filter.setFilterClause(filterClause);
-		return filter;
-	}
+//	public SearchFilterType buildFilter() {
+//		SearchFilterType filter = new SearchFilterType();
+//		filter.setFilterClause(filterClause);
+//		return filter;
+//	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> eq(Object... values) {
 		Element equal = queryForService.getDomSerializer().createEqualFilter(itemPath, Arrays.asList(values));
-		return new RestJaxbQueryBuilder<O>(this, equal);
+		return new RestJaxbQueryBuilder<O>(this, equal, owner);
 	}
 
 	@Override
 	public ConditionEntryBuilder<O> item(ItemPathType itemPath) {
-		return new RestJaxbQueryBuilder<O>(this, itemPath);
+		return new RestJaxbQueryBuilder<O>(this, itemPath, owner);
 	}
 
 	@Override
 	public ConditionEntryBuilder<O> item(QName... qnames) {
-		return new RestJaxbQueryBuilder<>(this, queryForService.util().createItemPathType(qnames));
+		return new RestJaxbQueryBuilder<>(this, queryForService.util().createItemPathType(qnames), owner);
 	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> eq() {
 		Element equal = queryForService.getDomSerializer().createEqualFilter(itemPath, null);
-		return new RestJaxbQueryBuilder<O>(this, equal);
+		return new RestJaxbQueryBuilder<O>(this, equal, owner);
 	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> eqPoly(String orig, String norm) {
 		Element equal = queryForService.getDomSerializer().createEqualPolyFilter(itemPath, orig, norm);
-		return new RestJaxbQueryBuilder<O>(this, equal);
+		return new RestJaxbQueryBuilder<O>(this, equal, owner);
 	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> eqPoly(String orig) {
-		// TODO Auto-generated method stub
-		return null;
+		Element equal = queryForService.getDomSerializer().createEqualPolyFilter(itemPath, orig, null);
+		return new RestJaxbQueryBuilder<O>(this, equal, owner);
 	}
 
 	@Override
 	public MatchingRuleEntryBuilder<O> gt(Object value) {
-		return null;
+		Element equal = queryForService.getDomSerializer().createGreaterFilter(itemPath, value);
+		return new RestJaxbQueryBuilder<O>(this, equal, owner);
 	}
 
 	@Override
@@ -254,22 +273,28 @@ public class RestJaxbQueryBuilder<O extends ObjectType> implements QueryBuilder<
 
 	@Override
 	public QueryBuilder<O> and() {
-		// TODO Auto-generated method stub
-		return null;
+		return finish().and();
 	}
 
 	@Override
 	public QueryBuilder<O> or() {
-		// TODO Auto-generated method stub
-		return null;
+		return finish().or();
+	}
+	
+	private FilterBuilder<O> finish() {
+		if (filterClause == null) {
+			throw new IllegalStateException("No filter created yet.");
+		}
+		return owner.addSubfilter(filterClause, false);
 	}
 
 	@Override
 	public QueryBuilder<O> finishQuery() {
-		QueryType query = new QueryType();
-		query.setFilter(buildFilter());;
-		
-		return new RestJaxbQueryBuilder<>(queryForService, type, query);
+		return finish().finishQuery();
+//		QueryType query = new QueryType();
+//		query.setFilter(buildFilter());;
+//		
+//		return new RestJaxbQueryBuilder<>(queryForService, type, query, owner);
 	}
 
 	@Override

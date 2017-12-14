@@ -34,6 +34,7 @@ import org.apache.cxf.common.util.CollectionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.evolveum.midpoint.client.api.exception.SchemaException;
 import com.evolveum.midpoint.client.api.exception.TunnelException;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.ObjectReferenceType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
@@ -50,10 +51,17 @@ public class DomSerializer {
 	private static final String FILTER_REF_OID = "oid";
 	private static final String FILTER_REF_TYPE = "type";
 	
+	private static final String FILTER_GREATER = "greater";
+	private static final String FILTER_LESS = "less";
+	
+	private static final String FILTER_NOT = "not";
+	private static final String FILTER_AND = "and";
+	private static final String FILTER_OR = "or";
+	
 	private static final String FILTER_PATH = "path";
 	private static final String FILTER_VALUE = "value";
 	
-//	private Document document;
+	private Document document;
 	private DocumentBuilder documentBuilder;
 	private JAXBContext jaxbContext;
 	
@@ -61,6 +69,7 @@ public class DomSerializer {
 		this.jaxbContext = jaxbContext;
 		try {
 			documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			document = documentBuilder.newDocument();
 		} catch (ParserConfigurationException e) {
 			throw new IOException(e);
 		}
@@ -68,7 +77,7 @@ public class DomSerializer {
 
 	
 	public Element createEqualFilter(ItemPathType itemPath, List<Object> values) {
-		Document document = documentBuilder.newDocument();
+//		Document document = documentBuilder.newDocument();
 		Element equal = createEqual(itemPath, document);
 		
 		List<Element> valueElements = createValueElements(values, document);
@@ -159,6 +168,65 @@ public class DomSerializer {
 		return ref;
 	}
 	
+	public Element createGreaterFilter(ItemPathType itemPath, Object realValue) {
+		Document document = documentBuilder.newDocument();
+		Element greater = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_GREATER);
+		Element path = document.createElement(FILTER_PATH);
+		path.setTextContent(itemPath.getValue());
+		greater.appendChild(path);
+		
+		Element value = document.createElement(FILTER_VALUE);
+		Marshaller marshaller;
+		try {
+			marshaller = jaxbContext.createMarshaller();
+			marshaller.marshal(new JAXBElement(new QName(SchemaConstants.NS_QUERY, "value"), realValue.getClass(), realValue),
+					value);
+			
+		} catch (JAXBException e) {
+			//throw new SchemaException(e);
+		}
+		
+		greater.appendChild(value);
+		return greater;
+	}
+	
+	public Element createNotFilter(Element filter) {
+		Document document = documentBuilder.newDocument();
+		Element not = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_NOT);
+		not.appendChild(filter);
+		return not;
+	}
+	
+	public Element createAndFilter(Element filter) {
+		Document document = null;
+		if (filter != null) {
+			document = filter.getOwnerDocument();
+		} else {
+			return null;
+		}
+		Element and = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_AND);
+		and.appendChild(filter);
+		return and;
+	}
+	
+	public Element addCondition(Element andFilter, Element subFilter) {
+		andFilter.appendChild(subFilter);
+		return andFilter;
+	}
+	
+	public Element createOrFilter(List<Element> children) {
+		if (children == null) {
+			return null;
+		}
+		
+		if (children.isEmpty()) {
+			return null;
+		}
+		Document document = children.iterator().next().getOwnerDocument();
+		Element or = document.createElementNS(SchemaConstants.NS_QUERY, FILTER_OR);
+		children.forEach(child -> or.appendChild(child));
+		return or;
+	}
 	
 	
 }
