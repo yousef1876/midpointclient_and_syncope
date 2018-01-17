@@ -21,6 +21,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.rmi.CORBA.Util;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
@@ -55,6 +57,8 @@ import com.evolveum.midpoint.client.api.exception.AuthenticationException;
 import com.evolveum.midpoint.client.api.exception.ObjectNotFoundException;
 import com.evolveum.midpoint.client.impl.restjaxb.service.AuthenticationProvider;
 import com.evolveum.midpoint.client.impl.restjaxb.service.MidpointMockRestService;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationStatusType;
+import com.evolveum.midpoint.xml.ns._public.common.common_3.ActivationType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.OperationResultStatusType;
 import com.evolveum.midpoint.xml.ns._public.common.common_3.UserType;
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
@@ -66,7 +70,7 @@ import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
 public class TestBasic {
 	
 	private static Server server;
-	private static final String ENDPOINT_ADDRESS = "http://localhost:18080/rest";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:8080/midpoint/ws/rest";
 //	private static final String ENDPOINT_ADDRESS = "http://mpdev1.its.uwo.pri:8080/midpoint/ws/rest";
 	private static final String ADMIN = "administrator";
 	private static final String ADMIN_PASS = "5ecr3t";
@@ -83,6 +87,12 @@ public class TestBasic {
 		UserType userBefore = new UserType();
 		userBefore.setName(service.util().createPoly("foo"));
 		userBefore.setOid("123");
+		
+		ActivationType activation = new ActivationType();
+		
+		XMLGregorianCalendar validFrom = service.util().asXMLGregorianCalendar(new Date());
+		activation.setValidFrom(validFrom);
+		userBefore.setActivation(activation);
 		
 		// WHEN
 		ObjectReference<UserType> ref = service.users().add(userBefore).post();
@@ -182,6 +192,15 @@ public class TestBasic {
 		// WHEN
 		ItemPathType itemPath = new ItemPathType();
 		itemPath.setValue("name");
+		
+		ItemPathType givenName = new ItemPathType();
+		givenName.setValue("givenName");
+		
+		ItemPathType activation = new ItemPathType();
+		activation.setValue("activation/administrativeStatus");
+		
+		ItemPathType emailAddress = new ItemPathType();
+		emailAddress.setValue("emailAddress");
 //		AssignmentType cal = new AssignmentType();
 //		cal.setDescription("asdasda");
 //		ObjectReferenceType ort = new ObjectReferenceType();
@@ -192,18 +211,18 @@ public class TestBasic {
 //		cal.setActivation(activation);
 		SearchResult<UserType> result = service.users().search().queryFor(UserType.class)
 				.item(itemPath)
-					.eq("jack")
+					.eqPoly("jack")
 				
 			.and()
-				.item(new QName("givenName"))
-					.eq("12")
+				.item(givenName)
+					.eqPoly("sparrow")
 				
 			.or()
-				.item(new QName("familyName"))
-					.eq("123")
+				.item(activation)
+					.eq(ActivationStatusType.ENABLED)
 			.and()
-				.item(new QName("familyName"))
-					.eq("345")
+				.item(emailAddress)
+					.eq("jack@example.com")
 				.finishQuery()
 				.get();
 		

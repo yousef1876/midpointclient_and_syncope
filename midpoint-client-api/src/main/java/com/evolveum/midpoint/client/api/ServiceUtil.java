@@ -15,6 +15,9 @@
  */
 package com.evolveum.midpoint.client.api;
 
+import java.util.Date;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import com.evolveum.prism.xml.ns._public.types_3.ItemPathType;
@@ -32,5 +35,7 @@ public interface ServiceUtil {
 	
 	public ItemPathType createItemPathType(QName... qname);
 	// TODO: util methods for object extension
+	
+	public XMLGregorianCalendar asXMLGregorianCalendar(Date date);
 
 }

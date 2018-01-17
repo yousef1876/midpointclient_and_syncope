@@ -16,8 +16,13 @@
 package com.evolveum.midpoint.client.impl.restjaxb;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import com.evolveum.midpoint.client.api.ServiceUtil;
@@ -32,6 +37,16 @@ import com.evolveum.prism.xml.ns._public.types_3.PolyStringType;
  *
  */
 public class RestJaxbServiceUtil implements ServiceUtil {
+	
+	private static DatatypeFactory df = null;
+	
+	static {
+        try {
+            df = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException dce) {
+            throw new IllegalStateException("Exception while obtaining Datatype Factory instance", dce);
+        }
+    }
 	
 	@Override
 	public PolyStringType createPoly(String orig) {
@@ -61,6 +76,17 @@ public class RestJaxbServiceUtil implements ServiceUtil {
 		Arrays.asList(qname).forEach(name -> itemPathType.setValue(itemPathType + "/" + name.getLocalPart()));
 		return itemPathType;
 	}
+	
+	@Override
+	 public XMLGregorianCalendar asXMLGregorianCalendar(Date date) {
+	        if (date == null) {
+	            return null;
+	        } else {
+	            GregorianCalendar gc = new GregorianCalendar();
+	            gc.setTimeInMillis(date.getTime());
+	            return df.newXMLGregorianCalendar(gc);
+	        }
+	    }
 
 
 }
